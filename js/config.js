@@ -5,9 +5,8 @@
 // ========================================================================
 
 const CONFIG = {
-  // Masukkan Web App URL dari deployment Google Apps Script (Execute as: Me, Who has access: Anyone)
-  // Contoh: https://script.google.com/macros/s/AKfycbx.../exec
-  GAS_URL: localStorage.getItem('NUTRITRACK_GAS_URL') || '',
+  // Web App URL dari deployment Google Apps Script (Execute as: Me, Who has access: Anyone)
+  GAS_URL: localStorage.getItem('NUTRITRACK_GAS_URL') || 'https://script.google.com/macros/s/AKfycbzGPKKWL44XxBw2Urkr4_0V1E70sfE_kfG1YMJh9w92PqarjCXLe7xW9Ad4kBeTQyar/exec',
 
   // Informasi Brand & Versi
   APP_NAME: 'NutriTrack & FitLife',
