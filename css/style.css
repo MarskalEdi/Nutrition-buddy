@@ -1,0 +1,80 @@
+/* ========================================================================
+   style.css: NutriTrack & FitLife - Custom Animations & Touch Ergonomics
+   Palette: Fresh Leaf Green (#8BC34A), Soft Mint (#F1F8E9), Charcoal (#1A1B22)
+   ======================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
+
+:root {
+  --color-primary: #8BC34A;
+  --color-primary-dark: #689F38;
+  --color-bg: #F9F9F7;
+  --color-surface-tint: #F1F8E9;
+  --color-charcoal: #1A1B22;
+  --color-flame: #FF7043;
+  --color-fat: #29B6F6;
+  --color-carbs: #FFA726;
+  --color-water: #0288D1;
+  --color-muted: #78767B;
+  --color-hairline: #E8E7EC;
+}
+
+body {
+  background-color: #ECEAE4;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+/* Number metrics lining figures */
+.metric-tabular {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* Hide scrollbars cleanly */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Laser Scanner Animation */
+@keyframes laserScan {
+  0% { top: 12%; opacity: 0.8; }
+  50% { top: 88%; opacity: 1; }
+  100% { top: 12%; opacity: 0.8; }
+}
+
+.animate-laser {
+  animation: laserScan 2.2s ease-in-out infinite;
+}
+
+/* Pulsing Badge Effect */
+@keyframes pulseGlow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.15); }
+}
+
+.pulse-dot {
+  animation: pulseGlow 1.8s infinite;
+}
+
+/* Safe area padding for iPhone Dynamic Island and Gesture Bar */
+.safe-area-bottom {
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));
+}
+
+/* Tactile button active scale */
+button:active {
+  transform: scale(0.97);
+}
+
+/* Smooth Circular Ring Gauge */
+circle {
+  transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
