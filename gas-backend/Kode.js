@@ -99,7 +99,7 @@ function doPost(e) {
       res = { success: true, message: 'Sesi latihan berhasil dicatat', data: woRow };
 
     } else if (action === 'gemini_chat') {
-      const aiReply = panggilGeminiAI_(body.prompt, body.imageBase64);
+      const aiReply = panggilGeminiAI_(body.prompt, body.imageBase64, body.history, body.user_profile);
       res = { success: true, data: aiReply };
 
     } else if (action === 'calculate_calorie') {

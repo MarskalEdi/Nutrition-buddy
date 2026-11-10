@@ -1,9 +1,9 @@
 // ========================================================================
 // sw.js: Service Worker NutriTrack & FitLife PWA
-// Versi 4: Network-First untuk Dokumen HTML & Auto-Update Asset
+// Versi 5: Multi-Turn AI Coach & Smart Fallback Cache Bust
 // ========================================================================
 
-const CACHE_NAME = 'nutritrack-pwa-v4';
+const CACHE_NAME = 'nutritrack-pwa-v5';
 const PRECACHE_ASSETS = [
   './manifest.json',
   './css/style.css',
@@ -19,7 +19,7 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('[SW v4] Pre-caching offline assets');
+      console.log('[SW v5] Pre-caching offline assets');
       return cache.addAll(PRECACHE_ASSETS).catch(err => console.warn('Cache warning:', err));
     })
   );
@@ -31,7 +31,7 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         keys.map((k) => {
           if (k !== CACHE_NAME) {
-            console.log('[SW v4] Menghapus cache lama:', k);
+            console.log('[SW v5] Menghapus cache lama:', k);
             return caches.delete(k);
           }
         })

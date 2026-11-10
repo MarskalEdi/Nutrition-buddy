@@ -6,67 +6,77 @@
 // ------------------------------------------------------------------------
 // 1. Chat AI Diet Virtual
 // ------------------------------------------------------------------------
-function panggilGeminiAI_(promptText, imageBase64) {
+function panggilGeminiAI_(promptText, imageBase64, history, userProfile) {
   const apiKey = prop_('GEMINI_API_KEY');
 
   // Jika API Key belum diisi, gunakan Smart Advisor Fallback agar tidak error!
   if (!apiKey) {
-    return fallbackSmartChat_(promptText);
+    return fallbackSmartChat_(promptText, userProfile);
   }
 
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-
-  const parts = [];
+  const u = userProfile || {};
   const systemInstruction = 
-    "Anda adalah NutriTrack AI Coach, asisten ahli nutrisi ramah, profesional, dan pakar diet sehat. " +
-    "Jika diminta rekomendasi makanan Indonesia, berikan saran spesifik dengan estimasi kalori dan makronutrisi (protein, fat, carbs) yang realistis. " +
-    "Jawablah dengan ringkas, memotivasi, dan langsung pada poinnya.";
+    "Anda adalah NutriTrack & FitLife AI Coach, pakar nutrisi klinis dan pelatih diet profesional.\n" +
+    (u.weightKg ? `PROFIL PENGGUNA: BB ${u.weightKg}kg, TB ${u.heightCm}cm, BMI ${u.bmi} (${u.bmiCategory}), BMR ${u.bmr} kcal, TDEE ${u.tdee} kcal, Target BB ${u.targetWeightKg}kg, Target Kalori ${u.targetCalories} kcal (defisit -${u.deficitLevel || 500} kcal/hari). Terkonsumsi ${u.consumedCalories || 0} kcal.\n` : '') +
+    "PEDOMAN MENJAWAB:\n" +
+    "1. Jawablah langsung, relevan, dan 100% nyambung dengan pertanyaan spesifik pengguna.\n" +
+    "2. Gunakan riwayat dialog (multi-turn) untuk memahami pertanyaan lanjutan.\n" +
+    "3. Selalu gunakan Bahasa Indonesia yang ramah, santun, memotivasi, dan mudah dipahami.\n" +
+    "4. Jika merekomendasikan makanan, selalu sertakan perkiraan kalori (kcal) dan makronutrisi (protein, lemak, karbohidrat).";
 
-  if (promptText) {
-    parts.push({
-      text: systemInstruction + "\n\nPertanyaan/Menu Pengguna: " + promptText
-    });
-  }
-
-  if (imageBase64) {
-    parts.push({
-      inlineData: {
-        mimeType: "image/jpeg",
-        data: imageBase64.replace(/^data:image\/\w+;base64,/, '')
-      }
-    });
+  // Gunakan riwayat percakapan jika ada
+  let contents = [];
+  if (Array.isArray(history) && history.length > 0) {
+    contents = history;
+  } else {
+    const parts = [];
+    if (promptText) parts.push({ text: promptText });
+    if (imageBase64) {
+      parts.push({
+        inlineData: {
+          mimeType: "image/jpeg",
+          data: imageBase64.replace(/^data:image\/\w+;base64,/, '')
+        }
+      });
+    }
+    contents = [{ role: 'user', parts: parts }];
   }
 
   const payload = {
-    contents: [{ parts: parts }],
+    system_instruction: {
+      parts: [{ text: systemInstruction }]
+    },
+    contents: contents,
     generationConfig: {
-      temperature: 0.3,
-      maxOutputTokens: 600
+      temperature: 0.4,
+      maxOutputTokens: 750
     }
   };
 
-  try {
-    const response = UrlFetchApp.fetch(endpoint, {
-      method: 'post',
-      contentType: 'application/json',
-      payload: JSON.stringify(payload),
-      muteHttpExceptions: true
-    });
+  const models = ['gemini-1.5-flash', 'gemini-2.0-flash'];
+  for (let i = 0; i < models.length; i++) {
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${models[i]}:generateContent?key=${apiKey}`;
+    try {
+      const response = UrlFetchApp.fetch(endpoint, {
+        method: 'post',
+        contentType: 'application/json',
+        payload: JSON.stringify(payload),
+        muteHttpExceptions: true
+      });
 
-    const json = JSON.parse(response.getContentText());
-    if (json.candidates && json.candidates.length > 0 && json.candidates[0].content) {
-      return json.candidates[0].content.parts[0].text;
+      const json = JSON.parse(response.getContentText());
+      if (json.candidates && json.candidates.length > 0 && json.candidates[0].content) {
+        return json.candidates[0].content.parts[0].text;
+      }
+      if (json.error) {
+        console.warn(`[Gemini ${models[i]} Error]`, json.error.message);
+      }
+    } catch (err) {
+      console.warn(`[Gemini ${models[i]} Fetch Error]`, err.message);
     }
-    if (json.error) {
-      console.warn('[Gemini Error]', json.error.message);
-      return fallbackSmartChat_(promptText);
-    }
-  } catch (err) {
-    console.warn('[Gemini Fetch Error]', err.message);
-    return fallbackSmartChat_(promptText);
   }
 
-  return fallbackSmartChat_(promptText);
+  return fallbackSmartChat_(promptText, userProfile);
 }
 
 // ------------------------------------------------------------------------
@@ -183,24 +193,49 @@ function kalkulatorGiziKamus_(query) {
   };
 }
 
-function fallbackSmartChat_(prompt) {
-  const q = String(prompt || '').toLowerCase();
+function fallbackSmartChat_(prompt, userProfile) {
+  const q = String(prompt || '').toLowerCase().trim();
+  const u = userProfile || {};
 
-  if (q.includes('warung') || q.includes('makan malam') || q.includes('siang')) {
+  if (/\b(halo|hai|pagi|siang|sore|malam|assalam|hi|hello)\b/.test(q)) {
+    return "Halo Brooks! ☀️ Senang bisa mendampingi program sehat Anda hari ini. Ada menu makanan yang ingin Anda tanyakan atau butuh saran pola makan ramah defisit kalori?";
+  }
+
+  if (q.includes('warung') || (q.includes('makan') && (q.includes('luar') || q.includes('saran')))) {
     return "Rekomendasi warung ramah defisit kalori:\n" +
-           "1. Sate ayam 10 tusuk tanpa lontong & bumbu kacang dipisah (~320 kcal, 32g protein).\n" +
-           "2. Soto ayam bening kuah rempah (~280 kcal, 24g protein).\n" +
-           "3. Pecel sayur porsi sedang tanpa rempeyek (~260 kcal).\n" +
-           "Tips: Hindari minuman manis dan mintalah es teh tawar.";
+           "1. Sate ayam 10 tusuk tanpa lontong & bumbu kacang dipisah (~380 kcal, 36g protein).\n" +
+           "2. Soto ayam bening kuah rempah nasi 1/2 (~320 kcal, 28g protein).\n" +
+           "3. Gado-gado tanpa kerupuk porsi sedang (~340 kcal, 14g protein).\n" +
+           "Tips: Pilih es teh tawar atau air putih hangat!";
   }
 
-  if (q.includes('camilan') || q.includes('dessert') || q.includes('buah')) {
-    return "Pilihan camilan malam sehat di bawah 100 kcal:\n" +
+  if (q.includes('camilan') || q.includes('snack') || q.includes('buah') || q.includes('semangka') || q.includes('ngemil')) {
+    return "Pilihan camilan sehat rendah kalori:\n" +
            "• 1 cup semangka potong (150g) ~45 kcal.\n" +
-           "• 1 butir telur rebus ~78 kcal.\n" +
-           "• 1 buah apel fuji segar ~95 kcal.\n" +
-           "Camilan ini mengenyangkan tanpa mengorbankan defisit harianmu!";
+           "• 1 butir telur rebus ~78 kcal (6.5g protein).\n" +
+           "• 1 buah apel segar ~95 kcal (kaya serat pektin).\n" +
+           "• Greek yogurt plain 100g ~60 kcal (10g protein).";
   }
 
-  return "Halo! Saya NutriTrack AI Coach. Untuk menjaga target penurunan berat badan, fokuslah pada makanan utuh tinggi protein, cukupi serat sayuran, dan jaga hidrasi 8 gelas air putih per hari. Anda bisa bertanya tentang menu makanan apa saja!";
+  if (q.includes('telur')) {
+    return "Telur adalah sumber protein super! 1 butir telur rebus utuh mengandung ~78 kcal dan 6.5g protein. 2 butir telur rebus memberi ~156 kcal dan 13g protein murni, sangat ideal untuk sarapan atau camilan defisit kalori.";
+  }
+
+  if (q.includes('nasi') || q.includes('karbo')) {
+    return "Anda tetap boleh makan nasi saat diet! 1 centong nasi putih (150g) bernilai ~204 kcal. Untuk kenyang lebih lama, dahulukan makan lauk protein dan serat sayuran sebelum menghabiskan nasi.";
+  }
+
+  if (q.includes('bmi') || q.includes('tdee') || q.includes('target bb') || q.includes('berat badan')) {
+    return `Profil metabolisme Anda: BMI ${u.bmi || 24.2} (${u.bmiCategory || 'Normal'}), TDEE ~${u.tdee || 2365} kcal/hari, Target kalori harian ~${u.targetCalories || 1865} kcal (defisit -${u.deficitLevel || 500} kcal/hari). Anda bisa mengubah target ini kapan saja lewat menu kalkulator BMI!`;
+  }
+
+  if (q.includes('lapar') || q.includes('susah turun') || q.includes('tips') || q.includes('cara') || q.includes('plateau')) {
+    return "Tips menjaga defisit kalori agar berat badan turun konsisten:\n" +
+           "1. Jaga defisit 300-500 kcal per hari secara konsisten (jangan memangkas terlalu ekstrem).\n" +
+           "2. Cukupi protein minimal 1.5 - 1.8g per kg berat badan.\n" +
+           "3. Minum 2 gelas air putih saat merasa lapar tiba-tiba.\n" +
+           "4. Tidur cukup 7-8 jam per hari untuk menstabilkan hormon lapar ghrelin.";
+  }
+
+  return "Halo Brooks! Saya FitLife AI Coach. Untuk konsultasi bebas tanpa batas seputar menu dan diet, pastikan Google Gemini API Key Anda sudah dimasukkan di menu Pengaturan. Anda juga bisa menanyakan kalori makanan tertentu langsung di sini!";
 }
