@@ -311,36 +311,76 @@ function sendUserChatMessage() {
   input.value = '';
   stream.scrollTop = stream.scrollHeight;
 
+  // Typing indicator bubble
+  const typingBubble = document.createElement('div');
+  typingBubble.id = 'aiTypingBubble';
+  typingBubble.className = 'flex gap-2 items-center text-xs text-stone-500 italic py-1';
+  typingBubble.innerHTML = `
+    <div class="w-6 h-6 rounded-full bg-[#8BC34A] text-white flex items-center justify-center text-xs shrink-0">
+      <i data-lucide="bot" class="w-3.5 h-3.5"></i>
+    </div>
+    <span class="animate-pulse">FitLife AI sedang menganalisis...</span>
+  `;
+  stream.appendChild(typingBubble);
+  stream.scrollTop = stream.scrollHeight;
+  if (window.lucide) lucide.createIcons();
+
   // Call Google Apps Script Gemini AI Proxy if available
   if (CONFIG.GAS_URL) {
     postToGAS('gemini_chat', { prompt: msg })
       .then(res => {
-        if (res.success && res.data) {
+        document.getElementById('aiTypingBubble')?.remove();
+        if (res && res.success && res.data && typeof res.data === 'string' && !res.data.includes('belum disetel')) {
           appendAIBubble(res.data);
         } else {
           fallbackAIResponse(msg);
         }
       })
-      .catch(() => fallbackAIResponse(msg));
+      .catch(() => {
+        document.getElementById('aiTypingBubble')?.remove();
+        fallbackAIResponse(msg);
+      });
   } else {
-    setTimeout(() => fallbackAIResponse(msg), 600);
+    setTimeout(() => {
+      document.getElementById('aiTypingBubble')?.remove();
+      fallbackAIResponse(msg);
+    }, 600);
   }
 }
 
 function fallbackAIResponse(msg) {
-  const stream = document.getElementById('aiChatStream');
-  let text = "Pilihan menu yang sangat baik! Tetap perhatikan porsi karbohidrat dan minum cukup air putih agar defisit kalori Anda hari ini tetap berhasil.";
-  
-  if (msg.toLowerCase().includes('warung')) {
-    text = "Rekomendasi warung tinggi protein &lt; 400 kcal: Sate ayam tanpa bumbu kacang pekat (~320 kcal) atau sup ayam bening dengan sayuran segar (~280 kcal).";
-  } else if (msg.toLowerCase().includes('camilan') || msg.toLowerCase().includes('dessert')) {
-    text = "Camilan rendah kalori ideal: 1 porsi buah semangka (150g) hanya ~45 kcal dan kaya elektrolit, atau apel fuji segar (~90 kcal).";
+  document.getElementById('aiTypingBubble')?.remove();
+  const q = String(msg || '').toLowerCase();
+  let text = "";
+
+  // Check if asking about specific food in dictionary
+  const foodMatch = calculateOfflineFoodCalories(msg);
+  if (foodMatch && foodMatch.nama_makanan && !foodMatch.nama_makanan.includes('Menu Harian')) {
+    text = `Analisis gizi <strong>${foodMatch.nama_makanan}</strong>: Estimasi <strong>~${foodMatch.kalori} kcal</strong>, Protein <strong>${foodMatch.protein}g</strong>, Lemak <strong>${foodMatch.fat}g</strong>, Karbohidrat <strong>${foodMatch.carbs}g</strong> (${foodMatch.porsi}).<br><br>💡 <em>Saran Diet:</em> ${foodMatch.saran}`;
+  } else if (q.includes('warung')) {
+    text = "Rekomendasi menu warung tinggi protein &lt; 400 kcal:<br>• <strong>Sate Ayam Tanpa Lontong (10 tusuk)</strong>: ~380 kcal, 36g protein.<br>• <strong>Soto Ayam Bening (1 mangkuk)</strong>: ~280 kcal, 24g protein.<br>• <strong>Dada Ayam Bakar</strong>: ~240 kcal, 35g protein.<br><br>💡 <em>Tips Warung:</em> Minta kuah atau bumbu kacang dipisah agar asupan kalori dan lemak terkendali!";
+  } else if (q.includes('camilan') || q.includes('snack') || q.includes('dessert') || q.includes('buah')) {
+    text = "Pilihan camilan sehat & rendah kalori untuk program defisit Anda:<br>• <strong>Semangka Potong (150g)</strong>: ~45 kcal, kaya air hidrasi.<br>• <strong>Apel Fuji (1 buah)</strong>: ~95 kcal, tinggi serat pektin.<br>• <strong>1 Butir Telur Rebus</strong>: ~78 kcal, 6.5g protein murni.<br>• <strong>Greek Yogurt Plain (100g)</strong>: ~60 kcal, 10g protein.";
+  } else if (q.includes('telur') || q.includes('egg')) {
+    text = "Telur adalah salah satu sumber protein terbaik untuk diet! 1 butir telur rebus utuh mengandung <strong>~78 kcal dan 6.5g protein</strong>. Putih telurnya saja hanya <strong>~17 kcal dengan 3.6g protein</strong> bebas lemak. Sangat cocok dijadikan menu sarapan atau sarapan pasca-latihan.";
+  } else if (q.includes('nasi') || q.includes('karbo')) {
+    text = "Anda tetap bisa makan nasi saat diet! 1 centong nasi putih (150g) bernilai <strong>~204 kcal</strong>. Untuk kenyang lebih lama dengan indeks glikemik lebih rendah, pilih <strong>nasi merah (~165 kcal)</strong> atau campur dengan nasi shirataki. Pastikan dipadukan dengan lauk berprotein tinggi!";
+  } else if (q.includes('kalori') || q.includes('defisit') || q.includes('target') || q.includes('sisa')) {
+    const remaining = Math.max(0, AppState.user.targetCalories - AppState.user.consumedCalories);
+    text = `Status kalori harian Anda: Target <strong>${AppState.user.targetCalories} kcal</strong> (target defisit -500 kcal). Konsumsi saat ini: <strong>${AppState.user.consumedCalories} kcal</strong>. Sisa kuota kalori Anda hari ini: <strong>${remaining} kcal</strong>. Tetap semangat, Anda berada di jalur yang benar! 🎯`;
+  } else if (q.includes('olahraga') || q.includes('workout') || q.includes('latihan')) {
+    text = "Untuk membakar lemak optimal tanpa kehilangan massa otot, lakukan sesi latihan <strong>10–15 menit</strong> setiap hari. Anda bisa memilih menu latihan 'Morning Fat Burn' atau 'Core Sculpt &amp; Tight Plank' di tab Workout aplikasi ini untuk membakar 110–140 kcal!";
+  } else if (q.includes('air') || q.includes('minum') || q.includes('water')) {
+    text = "Hidrasi sangat krusial untuk laju metabolisme dan mencegah rasa lapar palsu. Pastikan minum minimal <strong>8 gelas (2 liter) air putih</strong> setiap hari. Pantau kemajuan Anda melalui pelacak Water Intake di halaman Home!";
+  } else {
+    text = `Pertanyaan yang sangat bagus seputar pola hidup sehat! Fokus utama untuk mencapai target berat badan adalah menjaga <strong>defisit kalori harian</strong> yang konsisten, mencukupi <strong>protein (~1.5–2g per kg BB)</strong>, serta tidur cukup 7–8 jam setiap malam. Ada menu atau makanan tertentu yang ingin dihitung nilai gizinya?`;
   }
 
   appendAIBubble(text);
 }
 
 function appendAIBubble(text) {
+  document.getElementById('aiTypingBubble')?.remove();
   const stream = document.getElementById('aiChatStream');
   const bubble = document.createElement('div');
   bubble.className = 'flex gap-2.5 items-start';
@@ -488,7 +528,332 @@ function downloadOfficialReportPDF() {
 }
 
 // ========================================================================
-// 8. BACKEND GAS REST API HELPER (GAS-PRO-API)
+// 8. INPUT MAKANAN & KALKULATOR KALORI AI
+// ========================================================================
+let currentSelectedMealType = 'Dinner';
+
+function openAddFoodCalcModal(mealType) {
+  if (mealType) {
+    selectMealTypeSegment(mealType);
+  }
+  document.getElementById('modalAddFoodCalc').classList.remove('hidden');
+  document.getElementById('inputFoodQuery').focus();
+}
+
+function closeAddFoodCalcModal() {
+  document.getElementById('modalAddFoodCalc').classList.add('hidden');
+}
+
+function selectMealTypeSegment(mealType) {
+  currentSelectedMealType = mealType;
+  const types = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
+  types.forEach(t => {
+    const btn = document.getElementById(`segBtn${t}`);
+    if (btn) {
+      if (t === mealType) {
+        btn.className = 'seg-meal-btn py-2 rounded-xl border-2 border-[#1A1B22] bg-[#1A1B22] text-white text-xs font-extrabold transition';
+      } else {
+        btn.className = 'seg-meal-btn py-2 rounded-xl border border-stone-200 text-xs font-extrabold text-stone-600 transition';
+      }
+    }
+  });
+}
+
+function quickFillFood(foodName) {
+  document.getElementById('inputFoodQuery').value = foodName;
+  executeFoodAICalculation();
+}
+
+async function executeFoodAICalculation() {
+  const query = document.getElementById('inputFoodQuery').value.trim();
+  if (!query) {
+    alert('Masukkan nama makanan terlebih dahulu!');
+    return;
+  }
+
+  const btn = document.getElementById('btnCalculateAI');
+  const oldText = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = `<span class="animate-spin mr-1">⏳</span> Menghitung...`;
+
+  try {
+    let result = null;
+
+    // 1. Coba panggil Google Apps Script Backend (Gemini AI Proxy)
+    if (CONFIG.GAS_URL) {
+      try {
+        const res = await postToGAS('calculate_calorie', { query: query });
+        if (res && res.success && res.data) {
+          result = res.data;
+        }
+      } catch (e) {
+        console.warn('Backend calc failed, fallback to local engine:', e);
+      }
+    }
+
+    // 2. Jika offline atau GAS gagal, gunakan kamus nutrisi cerdas lokal
+    if (!result) {
+      result = calculateOfflineFoodCalories(query);
+    }
+
+    // Isi formulir hasil
+    document.getElementById('calcFoodName').value = result.nama_makanan || query;
+    document.getElementById('calcFoodKcal').value = result.kalori || 300;
+    document.getElementById('calcFoodProtein').value = result.protein || 15;
+    document.getElementById('calcFoodFat').value = result.fat || 10;
+    document.getElementById('calcFoodCarbs').value = result.carbs || 35;
+    document.getElementById('calcFoodPortion').value = result.porsi || '1 Porsi (~200g)';
+    document.getElementById('calcFoodAdvice').innerText = `💡 Catatan AI: ${result.saran || 'Profil gizi seimbang. Minum air putih yang cukup.'}`;
+
+    // Highlight animasi lembut
+    const box = document.getElementById('boxCalcResult');
+    box.classList.add('ring-2', 'ring-[#8BC34A]');
+    setTimeout(() => box.classList.remove('ring-2', 'ring-[#8BC34A]'), 1000);
+
+    if (navigator.vibrate) navigator.vibrate(40);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = oldText;
+    if (window.lucide) lucide.createIcons();
+  }
+}
+
+function saveCalculatedMealToLog() {
+  const name = document.getElementById('calcFoodName').value.trim() || 'Menu Makanan';
+  const kcal = Number(document.getElementById('calcFoodKcal').value) || 0;
+  const protein = Number(document.getElementById('calcFoodProtein').value) || 0;
+  const fat = Number(document.getElementById('calcFoodFat').value) || 0;
+  const carbs = Number(document.getElementById('calcFoodCarbs').value) || 0;
+  const portion = document.getElementById('calcFoodPortion').value.trim();
+  const mealType = currentSelectedMealType;
+
+  // 1. Update State Lokal & Cincin Kalori
+  AppState.user.consumedCalories += kcal;
+  renderCalorieHero();
+  saveCachedState();
+
+  // 2. Update baris interval di DOM
+  const mealTypeMap = {
+    Breakfast: { kcal: 'txtBfKcal', desc: 'txtBfDesc' },
+    Lunch: { kcal: 'txtLunchKcal', desc: 'txtLunchDesc' },
+    Dinner: { kcal: 'txtDinnerKcal', desc: 'txtDinnerDesc' },
+    Snack: { kcal: 'txtSnackKcal', desc: 'txtSnackDesc' }
+  };
+  if (mealTypeMap[mealType]) {
+    const elKcal = document.getElementById(mealTypeMap[mealType].kcal);
+    const elDesc = document.getElementById(mealTypeMap[mealType].desc);
+    if (elKcal) elKcal.innerText = `+${kcal} kcal`;
+    if (elDesc) elDesc.innerText = `${name} (${portion})`;
+  }
+
+  // 3. Simpan ke Google Sheets via GAS REST API
+  if (CONFIG.GAS_URL) {
+    postToGAS('log_meal', {
+      user_id: AppState.user.nomor_wa,
+      waktu_makan: mealType,
+      nama_makanan: name,
+      kalori_kkal: kcal,
+      protein: protein,
+      fat: fat,
+      carbs: carbs,
+      porsi: portion
+    }).then(res => console.log('Tersimpan di Google Sheets:', res))
+      .catch(err => console.warn('Gagal simpan ke Sheets:', err));
+  }
+
+  closeAddFoodCalcModal();
+  alert(`Berhasil mencatat "${name}" (+${kcal} kcal) ke ${mealType}! Cincin kalori telah diperbarui.`);
+}
+
+// Kamus Nutrisi Makanan Indonesia Lengkap (Offline / Built-in Fallback)
+function calculateOfflineFoodCalories(query) {
+  const q = String(query || '').toLowerCase().trim();
+
+  const DB = [
+    { k: ['nasi putih'], nama: 'Nasi Putih', kalori: 204, p: 4.2, f: 0.4, c: 45, porsi: '1 Centong (150g)', saran: 'Sumber karbohidrat utama. Batasi 1 centong jika sedang defisit kalori.' },
+    { k: ['nasi merah'], nama: 'Nasi Merah', kalori: 165, p: 3.8, f: 1.2, c: 35, porsi: '1 Centong (150g)', saran: 'Kaya serat & indeks glikemik rendah, sangat bagus untuk kenyang lebih lama.' },
+    { k: ['nasi goreng'], nama: 'Nasi Goreng Telur', kalori: 450, p: 14, f: 18, c: 58, porsi: '1 Piring (250g)', saran: 'Tinggi kalori dari minyak goreng. Kurangi porsi nasi dan tambahkan mentimun.' },
+    { k: ['nasi uduk'], nama: 'Nasi Uduk', kalori: 380, p: 7, f: 16, c: 52, porsi: '1 Porsi (200g)', saran: 'Mengandung santan kelapa. Hindari gorengan tambahan agar defisit terjaga.' },
+    { k: ['ayam bakar', 'dada ayam'], nama: 'Dada Ayam Bakar', kalori: 240, p: 35, f: 6, c: 8, porsi: '1 Potong (150g)', saran: 'Super protein! Sangat ideal untuk menjaga otot dan mempercepat metabolisme.' },
+    { k: ['ayam geprek'], nama: 'Ayam Geprek Sambal Bawang', kalori: 480, p: 32, f: 28, c: 24, porsi: '1 Porsi Lengkap', saran: 'Kaya protein, namun tepungnya menyerap minyak. Kurangi makan kulitnya.' },
+    { k: ['ayam goreng'], nama: 'Ayam Goreng', kalori: 320, p: 26, f: 20, c: 8, porsi: '1 Potong', saran: 'Tinggi protein. Sisihkan kulitnya untuk memangkas hingga 100 kalori lemak.' },
+    { k: ['sate ayam'], nama: 'Sate Ayam Tanpa Lontong', kalori: 380, p: 36, f: 14, c: 12, porsi: '10 Tusuk', saran: 'Minta bumbu kacang dipisah untuk mengontrol asupan kalori.' },
+    { k: ['soto ayam'], nama: 'Soto Ayam Bening', kalori: 280, p: 24, f: 8, c: 26, porsi: '1 Mangkuk', saran: 'Kuah kaldu bening sangat ramah diet dan mengenyangkan.' },
+    { k: ['rendang'], nama: 'Rendang Daging Sapi', kalori: 350, p: 28, f: 22, c: 8, porsi: '1 Potong (100g)', saran: 'Kaya zat besi & protein. Batasi minyak santan untuk program defisit.' },
+    { k: ['telur rebus'], nama: 'Telur Ayam Rebus', kalori: 78, p: 6.5, f: 5.3, c: 0.6, porsi: '1 Butir (50g)', saran: 'Pilihan sarapan dan camilan tinggi protein terbaik dengan harga terjangkau.' },
+    { k: ['telur ceplok', 'telur mata sapi'], nama: 'Telur Ceplok Goreng', kalori: 115, p: 6.5, f: 9.2, c: 0.8, porsi: '1 Butir', saran: 'Goreng dengan sedikit minyak atau gunakan teflon anti-lengket.' },
+    { k: ['telur dadar'], nama: 'Telur Dadar', kalori: 140, p: 7.2, f: 11, c: 1.5, porsi: '1 Butir', saran: 'Tambahkan irisan daun bawang dan cabai agar lebih kaya serat.' },
+    { k: ['gado gado', 'gado-gado'], nama: 'Gado-Gado', kalori: 340, p: 14, f: 15, c: 42, porsi: '1 Piring', saran: 'Kaya serat sayuran. Kurangi porsi kerupuk untuk menghemat kalori.' },
+    { k: ['tempe'], nama: 'Tempe Goreng', kalori: 120, p: 7, f: 7, c: 8, porsi: '1 Potong Sedang', saran: 'Sumber protein nabati dan probiotik yang sangat sehat bagi pencernaan.' },
+    { k: ['tahu'], nama: 'Tahu Goreng', kalori: 90, p: 6, f: 6, c: 3, porsi: '1 Potong Sedang', saran: 'Rendah kalori dan mudah dipadukan dengan berbagai menu harian.' },
+    { k: ['semangka'], nama: 'Semangka Potong', kalori: 45, p: 0.9, f: 0.2, c: 11, porsi: '1 Cup (150g)', saran: '92% air. Camilan manis segar yang sangat aman bagi program diet.' },
+    { k: ['apel'], nama: 'Apel Segar', kalori: 95, p: 0.5, f: 0.3, c: 25, porsi: '1 Buah (180g)', saran: 'Tinggi serat pektin alami yang membantu rasa kenyang lebih stabil.' }
+  ];
+
+  for (let item of DB) {
+    if (item.k.some(key => q.includes(key))) {
+      return {
+        nama_makanan: item.nama,
+        kalori: item.kalori,
+        protein: item.p,
+        fat: item.f,
+        carbs: item.c,
+        porsi: item.porsi,
+        saran: item.saran
+      };
+    }
+  }
+
+  // Estimasi Cerdas Dinamis
+  let estKcal = 300, estP = 15, estF = 10, estC = 35;
+  if (q.includes('goreng') || q.includes('santan') || q.includes('crispy')) {
+    estKcal += 150; estF += 12;
+  }
+  if (q.includes('rebus') || q.includes('kukus') || q.includes('bakar')) {
+    estKcal -= 50; estF -= 5;
+  }
+  if (q.includes('daging') || q.includes('ayam') || q.includes('ikan') || q.includes('telur')) {
+    estP += 15;
+  }
+  if (q.includes('sayur') || q.includes('buah') || q.includes('salad')) {
+    estKcal -= 100; estC += 10;
+  }
+
+  const capitalize = s => s.charAt(0).toUpperCase() + s.slice(1);
+  return {
+    nama_makanan: capitalize(query || 'Menu Harian'),
+    kalori: Math.max(80, estKcal),
+    protein: Math.max(4, estP),
+    fat: Math.max(2, estF),
+    carbs: Math.max(5, estC),
+    porsi: '1 Porsi Standar (~200g)',
+    saran: 'Estimasi kalori cerdas berbasis bahan. Cukupi kebutuhan protein dan air harian.'
+  };
+}
+
+// ========================================================================
+// 9. SETTINGS MODAL: TABS, API KEYS & NOTIFIKASI WHATSAPP
+// ========================================================================
+function switchConfigTab(tabName) {
+  const tabs = ['gas', 'keys', 'wa'];
+  tabs.forEach(t => {
+    const btn = document.getElementById(`tabBtn${t.charAt(0).toUpperCase() + t.slice(1)}`);
+    const content = document.getElementById(`tabContent${t.charAt(0).toUpperCase() + t.slice(1)}`);
+    if (t === tabName) {
+      if (btn) btn.className = 'flex-1 py-2 rounded-xl bg-white text-[#1A1B22] shadow-xs transition';
+      if (content) content.classList.remove('hidden');
+    } else {
+      if (btn) btn.className = 'flex-1 py-2 rounded-xl text-stone-500 hover:text-stone-800 transition';
+      if (content) content.classList.add('hidden');
+    }
+  });
+
+  if (tabName === 'keys' && CONFIG.GAS_URL) {
+    checkApiKeysStatus();
+  }
+}
+
+async function checkApiKeysStatus() {
+  try {
+    const res = await fetch(`${CONFIG.GAS_URL}?action=get_api_status`);
+    const json = await res.json();
+    if (json.success) {
+      const bFonnte = document.getElementById('badgeFonnteStatus');
+      const bGemini = document.getElementById('badgeGeminiStatus');
+      if (bFonnte) {
+        bFonnte.innerText = json.hasFonnte ? `Aktif (${json.fonnteMasked})` : 'Belum diisi';
+        bFonnte.className = json.hasFonnte ? 'text-[10px] text-green-600 font-extrabold' : 'text-[10px] text-amber-600 font-bold';
+      }
+      if (bGemini) {
+        bGemini.innerText = json.hasGemini ? `Aktif (${json.geminiMasked})` : 'Belum diisi';
+        bGemini.className = json.hasGemini ? 'text-[10px] text-green-600 font-extrabold' : 'text-[10px] text-amber-600 font-bold';
+      }
+    }
+  } catch (e) {
+    console.log('Cek status API gagal:', e);
+  }
+}
+
+async function saveApiKeysToServer() {
+  const fonnteToken = document.getElementById('inputFonnteToken').value.trim();
+  const geminiKey = document.getElementById('inputGeminiApiKey').value.trim();
+
+  if (!fonnteToken && !geminiKey) {
+    alert('Masukkan setidaknya Fonnte Token atau Gemini API Key!');
+    return;
+  }
+
+  const btn = document.getElementById('btnSaveApiKeys');
+  const oldText = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = `<span class="animate-spin mr-1">⏳</span> Menyimpan ke server...`;
+
+  try {
+    const res = await postToGAS('save_api_keys', {
+      fonnte_token: fonnteToken,
+      gemini_api_key: geminiKey
+    });
+
+    if (res && res.success) {
+      alert('Kunci API berhasil disimpan secara aman di Script Properties Google Apps Script!');
+      document.getElementById('inputFonnteToken').value = '';
+      document.getElementById('inputGeminiApiKey').value = '';
+      checkApiKeysStatus();
+    } else {
+      alert(`Gagal menyimpan: ${res.message || 'Error server'}`);
+    }
+  } catch (err) {
+    alert(`Error: ${err.message}`);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = oldText;
+  }
+}
+
+async function executeTestWhatsAppPush() {
+  const target = document.getElementById('inputTestWaTarget').value.trim();
+  const message = document.getElementById('inputTestWaMessage').value.trim();
+
+  if (!target) {
+    alert('Harap masukkan nomor WhatsApp tujuan (misal: 081234567890)!');
+    return;
+  }
+
+  const btn = document.getElementById('btnSendTestWa');
+  const oldText = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = `<span class="animate-spin mr-1">⏳</span> Mengirim via Fonnte Gateway...`;
+
+  const boxLog = document.getElementById('boxWaResult');
+  const txtLog = document.getElementById('txtWaResultLog');
+  boxLog.classList.remove('hidden');
+  txtLog.innerText = 'Menghubungkan ke gateway Fonnte...';
+
+  try {
+    const res = await postToGAS('send_wa_test', {
+      target: target,
+      message: message,
+      nama: AppState.user.nama
+    });
+
+    if (res && res.success) {
+      txtLog.innerHTML = `<span class="text-green-600 font-extrabold">✓ BERHASIL:</span> ${res.message}<br><small class="text-stone-400">${JSON.stringify(res.detail || '')}</small>`;
+      alert(`Berhasil! Pesan WhatsApp telah dikirim ke nomor ${target}.`);
+    } else {
+      txtLog.innerHTML = `<span class="text-red-500 font-extrabold">✕ GAGAL:</span> ${res.message || 'Pesan gagal dikirim'}<br><small class="text-stone-400">Pastikan Token Fonnte sudah diisi di tab "2. Kunci API".</small>`;
+      alert(`Gagal mengirim WhatsApp:\n${res.message || 'Periksa Fonnte Token'}`);
+    }
+  } catch (err) {
+    txtLog.innerHTML = `<span class="text-red-500 font-extrabold">✕ ERROR:</span> ${err.message}`;
+    alert(`Error koneksi: ${err.message}`);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = oldText;
+  }
+}
+
+// ========================================================================
+// 10. BACKEND GAS REST API HELPER (GAS-PRO-API)
 // ========================================================================
 async function postToGAS(action, payload) {
   if (!CONFIG.GAS_URL) return { success: false, message: 'GAS_URL belum disetel' };
@@ -504,8 +869,12 @@ async function postToGAS(action, payload) {
 }
 
 function openConfigModal() {
-  document.getElementById('inputGasUrl').value = localStorage.getItem('NUTRITRACK_GAS_URL') || '';
+  document.getElementById('inputGasUrl').value = localStorage.getItem('NUTRITRACK_GAS_URL') || CONFIG.GAS_URL || '';
+  document.getElementById('inputTestWaTarget').value = AppState.user.nomor_wa || '';
   document.getElementById('modalConfig').classList.remove('hidden');
+  if (CONFIG.GAS_URL) {
+    checkApiKeysStatus();
+  }
 }
 
 function closeConfigModal() {
@@ -521,7 +890,7 @@ function saveGasConfig() {
 }
 
 async function testGasPing() {
-  const url = document.getElementById('inputGasUrl').value.trim();
+  const url = document.getElementById('inputGasUrl').value.trim() || CONFIG.GAS_URL;
   if (!url) {
     alert('Masukkan URL Web App GAS terlebih dahulu!');
     return;
@@ -536,7 +905,7 @@ async function testGasPing() {
 }
 
 // ========================================================================
-// 9. LOCAL STORAGE CACHING & UTILS
+// 11. LOCAL STORAGE CACHING & UTILS
 // ========================================================================
 function saveCachedState() {
   localStorage.setItem('NUTRITRACK_LOCAL_STATE', JSON.stringify(AppState.user));

@@ -195,8 +195,14 @@
         <!-- TODAY'S MEALS INTERVALS -->
         <div class="bg-white rounded-[28px] p-5 border border-[#E8E7EC] shadow-xs space-y-3.5">
           <div class="flex justify-between items-center">
-            <h3 class="text-base font-extrabold text-[#1A1B22]">Today's Meals</h3>
-            <span class="text-[11px] font-bold text-stone-400 tracking-wider">4 INTERVALS</span>
+            <div>
+              <h3 class="text-base font-extrabold text-[#1A1B22]">Today's Meals</h3>
+              <span class="text-[11px] font-bold text-stone-400">4 INTERVALS</span>
+            </div>
+            <button onclick="openAddFoodCalcModal()" class="px-3.5 py-1.5 rounded-full bg-[#1A1B22] text-white text-xs font-extrabold flex items-center gap-1.5 shadow-sm active:scale-95 transition">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5 text-[#8BC34A]"></i>
+              <span>+ Hitung Kalori AI</span>
+            </button>
           </div>
 
           <!-- Interval 1: Breakfast -->
@@ -210,13 +216,13 @@
                   <h4 class="text-sm font-bold text-[#1A1B22]">Breakfast</h4>
                   <div class="flex items-center text-[11px] font-extrabold text-[#FF7043]">
                     <i data-lucide="flame" class="w-3 h-3 fill-current mr-0.5"></i>
-                    <span>458 - 623 kcal</span>
+                    <span id="txtBfKcal">458 - 623 kcal</span>
                   </div>
                 </div>
-                <p class="text-xs text-stone-500 font-medium">Oats, Egg White Toast</p>
+                <p id="txtBfDesc" class="text-xs text-stone-500 font-medium">Oats, Egg White Toast</p>
               </div>
             </div>
-            <button onclick="openMealDetailModal('Mandarin Orange', 260, 4.0, 0.8, 56, 'Breakfast')" class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 flex items-center justify-center text-stone-700 active:scale-95 transition">
+            <button onclick="openAddFoodCalcModal('Breakfast')" class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 flex items-center justify-center text-stone-700 active:scale-95 transition">
               <i data-lucide="plus" class="w-4 h-4"></i>
             </button>
           </div>
@@ -232,13 +238,13 @@
                   <h4 class="text-sm font-bold text-[#1A1B22]">Lunch Time</h4>
                   <div class="flex items-center text-[11px] font-extrabold text-[#FF7043]">
                     <i data-lucide="flame" class="w-3 h-3 fill-current mr-0.5"></i>
-                    <span>558 - 732 kcal</span>
+                    <span id="txtLunchKcal">558 - 732 kcal</span>
                   </div>
                 </div>
-                <p class="text-xs text-stone-500 font-medium">Quinoa & Greens Salad</p>
+                <p id="txtLunchDesc" class="text-xs text-stone-500 font-medium">Quinoa & Greens Salad</p>
               </div>
             </div>
-            <button onclick="openMealDetailModal('Quinoa & Chicken Salad', 420, 38, 12, 45, 'Lunch')" class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 flex items-center justify-center text-stone-700 active:scale-95 transition">
+            <button onclick="openAddFoodCalcModal('Lunch')" class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 flex items-center justify-center text-stone-700 active:scale-95 transition">
               <i data-lucide="plus" class="w-4 h-4"></i>
             </button>
           </div>
@@ -254,13 +260,13 @@
                   <h4 class="text-sm font-bold text-[#1A1B22]">Dinner</h4>
                   <div class="flex items-center text-[11px] font-bold text-stone-500">
                     <i data-lucide="clock" class="w-3 h-3 mr-0.5"></i>
-                    <span>Remaining: 540 kcal</span>
+                    <span id="txtDinnerKcal">Remaining: 540 kcal</span>
                   </div>
                 </div>
-                <p class="text-xs text-stone-400 italic">Tap to log dinner</p>
+                <p id="txtDinnerDesc" class="text-xs text-stone-400 italic">Tap + to calculate & log dinner</p>
               </div>
             </div>
-            <button onclick="navigateToTab('scanner')" class="w-8 h-8 rounded-full bg-[#1A1B22] text-white flex items-center justify-center active:scale-95 transition shadow-xs">
+            <button onclick="openAddFoodCalcModal('Dinner')" class="w-8 h-8 rounded-full bg-[#1A1B22] text-white flex items-center justify-center active:scale-95 transition shadow-xs">
               <i data-lucide="plus" class="w-4 h-4"></i>
             </button>
           </div>
@@ -275,13 +281,13 @@
                 <div class="flex items-center gap-1.5">
                   <h4 class="text-sm font-bold text-[#1A1B22]">Evening Snack</h4>
                   <div class="flex items-center text-[11px] font-bold text-stone-500">
-                    <span>Remaining: 150 kcal</span>
+                    <span id="txtSnackKcal">Remaining: 150 kcal</span>
                   </div>
                 </div>
-                <p class="text-xs text-stone-400">Optional light snack</p>
+                <p id="txtSnackDesc" class="text-xs text-stone-400">Optional light snack</p>
               </div>
             </div>
-            <button onclick="openMealDetailModal('Mandarin Orange', 260, 4.0, 0.8, 56, 'Snack')" class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 flex items-center justify-center text-stone-700 active:scale-95 transition">
+            <button onclick="openAddFoodCalcModal('Snack')" class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 flex items-center justify-center text-stone-700 active:scale-95 transition">
               <i data-lucide="plus" class="w-4 h-4"></i>
             </button>
           </div>
@@ -615,7 +621,7 @@
               </p>
             </div>
           </div>
-          <button class="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center text-stone-600">
+          <button onclick="openConfigModal(); switchConfigTab('keys');" title="Pengaturan Kunci API AI" class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 flex items-center justify-center text-stone-600 active:scale-95 transition">
             <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
           </button>
         </div>
@@ -757,13 +763,127 @@
         <button class="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center text-stone-600 active:scale-95">
           <i data-lucide="mic" class="w-4 h-4"></i>
         </button>
-        <input id="aiChatInput" type="text" placeholder="Ask about meals, recipes, or calorie..." class="flex-1 px-4 py-2.5 rounded-full bg-stone-100 border border-[#E8E7EC] text-xs text-[#1A1B22] focus:outline-none focus:ring-2 focus:ring-[#8BC34A]">
+        <input id="aiChatInput" type="text" onkeypress="if(event.key==='Enter') sendUserChatMessage();" placeholder="Ask about meals, recipes, or calorie..." class="flex-1 px-4 py-2.5 rounded-full bg-stone-100 border border-[#E8E7EC] text-xs text-[#1A1B22] focus:outline-none focus:ring-2 focus:ring-[#8BC34A]">
         <button onclick="sendUserChatMessage()" class="w-10 h-10 rounded-full bg-[#8BC34A] text-white flex items-center justify-center active:scale-95 transition shadow-sm">
           <i data-lucide="send" class="w-4 h-4"></i>
         </button>
       </div>
 
     </section>
+
+    <!-- ================================================================= -->
+    <!-- MODAL: INPUT MAKANAN & HITUNG KALORI AI -->
+    <!-- ================================================================= -->
+    <div id="modalAddFoodCalc" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 hidden flex flex-col justify-end max-w-[440px] mx-auto">
+      <div class="bg-white rounded-t-[36px] max-h-[92vh] overflow-y-auto no-scrollbar p-6 space-y-4 shadow-2xl animate-in slide-in-from-bottom duration-300">
+        
+        <!-- Header -->
+        <div class="flex justify-between items-center">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-[#2E7D32]">
+              <i data-lucide="sparkles" class="w-4 h-4 text-[#8BC34A]"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-extrabold text-[#1A1B22]">Hitung Kalori Makanan (AI)</h3>
+              <p class="text-[10px] text-stone-500 font-semibold">Estimasi instan kalori &amp; nutrisi makro</p>
+            </div>
+          </div>
+          <button onclick="closeAddFoodCalcModal()" class="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center text-stone-600">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <!-- Input Bar with Search/AI Calc Button -->
+        <div class="space-y-2">
+          <label class="block text-xs font-bold text-stone-700">Nama Makanan / Minuman</label>
+          <div class="flex gap-2">
+            <input id="inputFoodQuery" type="text" onkeypress="if(event.key==='Enter') executeFoodAICalculation();" placeholder="misal: Nasi Padang Ayam Bakar, 2 Telur Rebus..." class="flex-1 px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs text-[#1A1B22] font-semibold focus:outline-none focus:ring-2 focus:ring-[#8BC34A]">
+            <button onclick="executeFoodAICalculation()" id="btnCalculateAI" class="px-4 py-2.5 rounded-xl bg-[#8BC34A] text-white text-xs font-extrabold flex items-center gap-1.5 shadow-sm active:scale-95 transition whitespace-nowrap">
+              <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
+              <span>Hitung AI</span>
+            </button>
+          </div>
+          <!-- Quick example chips -->
+          <div class="flex gap-1.5 overflow-x-auto no-scrollbar pt-1">
+            <button onclick="quickFillFood('Nasi Goreng Telur')" class="px-2.5 py-1 rounded-lg bg-stone-100 text-[10px] font-bold text-stone-600 whitespace-nowrap">Nasi Goreng Telur</button>
+            <button onclick="quickFillFood('Dada Ayam Bakar')" class="px-2.5 py-1 rounded-lg bg-stone-100 text-[10px] font-bold text-stone-600 whitespace-nowrap">Dada Ayam Bakar</button>
+            <button onclick="quickFillFood('Soto Ayam Bening')" class="px-2.5 py-1 rounded-lg bg-stone-100 text-[10px] font-bold text-stone-600 whitespace-nowrap">Soto Ayam</button>
+            <button onclick="quickFillFood('2 Telur Rebus')" class="px-2.5 py-1 rounded-lg bg-stone-100 text-[10px] font-bold text-stone-600 whitespace-nowrap">2 Telur Rebus</button>
+          </div>
+        </div>
+
+        <!-- Calculation Result Box (Editable!) -->
+        <div id="boxCalcResult" class="bg-[#F9F9F7] border border-[#E8E7EC] rounded-2xl p-4 space-y-3">
+          <div class="flex justify-between items-center">
+            <input id="calcFoodName" type="text" value="Menu Makanan" class="font-extrabold text-sm text-[#1A1B22] bg-transparent border-b border-dashed border-stone-300 focus:outline-none focus:border-[#8BC34A] w-3/5">
+            <div class="flex items-center gap-1 bg-orange-100/70 px-3 py-1 rounded-full text-[#FF7043] font-extrabold text-xs">
+              <i data-lucide="flame" class="w-3.5 h-3.5 fill-current"></i>
+              <input id="calcFoodKcal" type="number" value="350" class="w-12 bg-transparent text-right font-extrabold focus:outline-none">
+              <span>kcal</span>
+            </div>
+          </div>
+
+          <!-- 3 Macros Inputs -->
+          <div class="grid grid-cols-3 gap-2 text-center text-xs">
+            <div class="bg-white p-2 rounded-xl border border-stone-200">
+              <span class="text-[10px] font-bold text-stone-500 block">Protein</span>
+              <div class="flex items-center justify-center gap-0.5 mt-0.5">
+                <input id="calcFoodProtein" type="number" value="20" class="w-10 text-center font-extrabold text-[#2E7D32] bg-transparent focus:outline-none">
+                <span class="text-[10px] font-bold text-stone-400">g</span>
+              </div>
+            </div>
+            <div class="bg-white p-2 rounded-xl border border-stone-200">
+              <span class="text-[10px] font-bold text-stone-500 block">Lemak (Fat)</span>
+              <div class="flex items-center justify-center gap-0.5 mt-0.5">
+                <input id="calcFoodFat" type="number" value="12" class="w-10 text-center font-extrabold text-[#0288D1] bg-transparent focus:outline-none">
+                <span class="text-[10px] font-bold text-stone-400">g</span>
+              </div>
+            </div>
+            <div class="bg-white p-2 rounded-xl border border-stone-200">
+              <span class="text-[10px] font-bold text-stone-500 block">Karbohidrat</span>
+              <div class="flex items-center justify-center gap-0.5 mt-0.5">
+                <input id="calcFoodCarbs" type="number" value="40" class="w-10 text-center font-extrabold text-[#FFA726] bg-transparent focus:outline-none">
+                <span class="text-[10px] font-bold text-stone-400">g</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Portion & AI Advice Note -->
+          <div class="space-y-1.5 pt-1">
+            <div class="flex justify-between items-center text-xs">
+              <span class="font-bold text-stone-600">Porsi:</span>
+              <input id="calcFoodPortion" type="text" value="1 Porsi (~200g)" class="text-right font-bold text-stone-700 bg-transparent border-b border-dashed border-stone-300 focus:outline-none w-1/2">
+            </div>
+            <p id="calcFoodAdvice" class="text-[11px] text-[#2E7D32] font-semibold bg-[#F1F8E9] p-2.5 rounded-xl leading-relaxed">
+              💡 Catatan AI: Cukup seimbang untuk makan harian. Pastikan minum air putih 1-2 gelas setelah makan.
+            </p>
+          </div>
+        </div>
+
+        <!-- Meal Type Selector -->
+        <div class="space-y-1.5">
+          <label class="block text-xs font-bold text-stone-700">Waktu Makan</label>
+          <div class="grid grid-cols-4 gap-1.5">
+            <button type="button" onclick="selectMealTypeSegment('Breakfast')" id="segBtnBreakfast" class="seg-meal-btn py-2 rounded-xl border border-stone-200 text-xs font-extrabold text-stone-600 transition">Pagi</button>
+            <button type="button" onclick="selectMealTypeSegment('Lunch')" id="segBtnLunch" class="seg-meal-btn py-2 rounded-xl border border-stone-200 text-xs font-extrabold text-stone-600 transition">Siang</button>
+            <button type="button" onclick="selectMealTypeSegment('Dinner')" id="segBtnDinner" class="seg-meal-btn py-2 rounded-xl border-2 border-[#1A1B22] bg-[#1A1B22] text-white text-xs font-extrabold transition">Malam</button>
+            <button type="button" onclick="selectMealTypeSegment('Snack')" id="segBtnSnack" class="seg-meal-btn py-2 rounded-xl border border-stone-200 text-xs font-extrabold text-stone-600 transition">Camilan</button>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex gap-2.5 pt-2">
+          <button onclick="closeAddFoodCalcModal()" class="flex-1 py-3.5 rounded-full border border-stone-300 font-bold text-stone-700 text-xs active:scale-95 transition">
+            Batal
+          </button>
+          <button onclick="saveCalculatedMealToLog()" class="flex-1 py-3.5 rounded-full bg-[#1A1B22] text-white font-extrabold text-xs shadow-lg active:scale-95 transition flex items-center justify-center gap-1.5">
+            <i data-lucide="check-circle" class="w-4 h-4 text-[#8BC34A]"></i>
+            <span>Simpan ke Log Harian</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
 
     <!-- ================================================================= -->
     <!-- MODAL: MEAL LOG DETAIL (SCREEN 4) -->
@@ -964,36 +1084,102 @@
     </div>
 
     <!-- ================================================================= -->
-    <!-- MODAL: BACKEND GAS & FONNTE CONFIG -->
+    <!-- MODAL: BACKEND GAS, API KEYS & NOTIFIKASI WHATSAPP -->
     <!-- ================================================================= -->
     <div id="modalConfig" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 hidden flex flex-col justify-end max-w-[440px] mx-auto">
-      <div class="bg-white rounded-t-[36px] p-6 space-y-4 shadow-2xl">
+      <div class="bg-white rounded-t-[36px] max-h-[92vh] overflow-y-auto no-scrollbar p-6 space-y-4 shadow-2xl">
+        
+        <!-- Header -->
         <div class="flex justify-between items-center">
-          <h3 class="text-base font-extrabold text-[#1A1B22]">Pengaturan Koneksi Backend GAS</h3>
+          <div>
+            <h3 class="text-base font-extrabold text-[#1A1B22]">Pengaturan &amp; Integrasi</h3>
+            <p class="text-[10px] text-stone-500 font-semibold">Backend GAS, Gemini AI &amp; WhatsApp</p>
+          </div>
           <button onclick="closeConfigModal()" class="w-9 h-9 rounded-full bg-stone-100 flex items-center justify-center text-stone-700">
             <i data-lucide="x" class="w-4 h-4"></i>
           </button>
         </div>
 
-        <p class="text-xs text-stone-600 leading-relaxed">
-          Sesuai pola <strong>GAS-PRO-API</strong> &amp; <strong>gas-rahasia-script-properties</strong>, masukkan URL deployment Web App GAS Anda. Kredensial rahasia (Fonnte &amp; Gemini) aman tersimpan di server!
-        </p>
+        <!-- 3 Tabs Navigation -->
+        <div class="flex gap-1.5 p-1 bg-stone-100 rounded-2xl text-xs font-bold">
+          <button type="button" onclick="switchConfigTab('gas')" id="tabBtnGas" class="flex-1 py-2 rounded-xl bg-white text-[#1A1B22] shadow-xs transition">1. URL GAS</button>
+          <button type="button" onclick="switchConfigTab('keys')" id="tabBtnKeys" class="flex-1 py-2 rounded-xl text-stone-500 hover:text-stone-800 transition">2. Kunci API</button>
+          <button type="button" onclick="switchConfigTab('wa')" id="tabBtnWa" class="flex-1 py-2 rounded-xl text-stone-500 hover:text-stone-800 transition">3. Uji WA</button>
+        </div>
 
-        <div class="space-y-3 text-xs font-semibold">
+        <!-- TAB 1: URL BACKEND GAS -->
+        <div id="tabContentGas" class="config-tab space-y-3">
+          <p class="text-xs text-stone-600 leading-relaxed">
+            Sesuai standar <strong>GAS-PRO-API</strong>, masukkan URL Web App Google Apps Script Anda (Deployment: <em>Execute as: Me, Anyone</em>).
+          </p>
           <div>
-            <label class="block text-stone-700 mb-1">Google Apps Script Web App URL</label>
-            <input id="inputGasUrl" type="text" placeholder="https://script.google.com/macros/s/AKfycb.../exec" class="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-stone-800 focus:outline-none focus:ring-2 focus:ring-[#8BC34A]">
+            <label class="block text-xs font-bold text-stone-700 mb-1">Google Apps Script Web App URL</label>
+            <input id="inputGasUrl" type="text" placeholder="https://script.google.com/macros/s/AKfycb.../exec" class="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-xs text-stone-800 focus:outline-none focus:ring-2 focus:ring-[#8BC34A]">
+          </div>
+          <div class="flex gap-2 pt-1">
+            <button onclick="saveGasConfig()" class="flex-1 py-3 rounded-full bg-[#8BC34A] text-white font-bold text-xs shadow-md active:scale-95">
+              Simpan URL Backend
+            </button>
+            <button onclick="testGasPing()" class="px-4 py-3 rounded-full bg-stone-100 text-stone-700 font-bold text-xs active:scale-95">
+              Uji Ping
+            </button>
           </div>
         </div>
 
-        <div class="flex gap-2 pt-2">
-          <button onclick="saveGasConfig()" class="flex-1 py-3 rounded-full bg-[#8BC34A] text-white font-bold text-xs shadow-md active:scale-95">
-            Simpan URL Backend
-          </button>
-          <button onclick="testGasPing()" class="px-4 py-3 rounded-full bg-stone-100 text-stone-700 font-bold text-xs active:scale-95">
-            Uji Ping
+        <!-- TAB 2: KUNCI API (FONNTE & GEMINI) -->
+        <div id="tabContentKeys" class="config-tab space-y-3 hidden">
+          <p class="text-xs text-stone-600 leading-relaxed">
+            Simpan kunci API Anda langsung ke <strong>Script Properties</strong> server Google Apps Script Anda (Zero Literal Secrets di frontend):
+          </p>
+          <div class="space-y-2 text-xs font-semibold">
+            <div>
+              <label class="block text-stone-700 mb-1 flex items-center justify-between">
+                <span>Fonnte WhatsApp Token</span>
+                <span id="badgeFonnteStatus" class="text-[10px] text-stone-400 font-bold">Cek server...</span>
+              </label>
+              <input id="inputFonnteToken" type="password" placeholder="Token dari dashboard Fonnte Anda..." class="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-xs text-stone-800 focus:outline-none focus:ring-2 focus:ring-[#8BC34A]">
+            </div>
+            <div>
+              <label class="block text-stone-700 mb-1 flex items-center justify-between">
+                <span>Google Gemini API Key (Free Tier)</span>
+                <span id="badgeGeminiStatus" class="text-[10px] text-stone-400 font-bold">Cek server...</span>
+              </label>
+              <input id="inputGeminiApiKey" type="password" placeholder="AI Studio Gemini API Key..." class="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-xs text-stone-800 focus:outline-none focus:ring-2 focus:ring-[#8BC34A]">
+            </div>
+          </div>
+          <button onclick="saveApiKeysToServer()" id="btnSaveApiKeys" class="w-full py-3.5 rounded-full bg-[#1A1B22] text-white font-extrabold text-xs shadow-md active:scale-95 transition flex items-center justify-center gap-1.5">
+            <i data-lucide="shield-check" class="w-4 h-4 text-[#8BC34A]"></i>
+            <span>Simpan Kunci ke Server Apps Script</span>
           </button>
         </div>
+
+        <!-- TAB 3: UJI NOTIFIKASI WHATSAPP -->
+        <div id="tabContentWa" class="config-tab space-y-3 hidden">
+          <p class="text-xs text-stone-600 leading-relaxed">
+            Kirimkan pesan uji coba langsung ke nomor WhatsApp Anda untuk memastikan gateway Fonnte berfungsi dengan baik:
+          </p>
+          <div class="space-y-2 text-xs font-semibold">
+            <div>
+              <label class="block text-stone-700 mb-1">Nomor WhatsApp Tujuan</label>
+              <input id="inputTestWaTarget" type="tel" placeholder="081234567890 atau 6281234567890" class="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-xs text-stone-800 focus:outline-none focus:ring-2 focus:ring-[#8BC34A]">
+            </div>
+            <div>
+              <label class="block text-stone-700 mb-1">Isi Pesan Uji Coba</label>
+              <textarea id="inputTestWaMessage" rows="2" class="w-full px-4 py-2 rounded-xl border border-stone-300 text-xs text-stone-800 focus:outline-none focus:ring-2 focus:ring-[#8BC34A]">Halo! 🌟 Ini adalah notifikasi uji coba dari aplikasi NutriTrack &amp; FitLife. Sistem WhatsApp Gateway Fonnte Anda telah aktif!</textarea>
+            </div>
+          </div>
+          <button onclick="executeTestWhatsAppPush()" id="btnSendTestWa" class="w-full py-3.5 rounded-full bg-[#8BC34A] text-white font-extrabold text-xs shadow-md active:scale-95 transition flex items-center justify-center gap-1.5">
+            <i data-lucide="send" class="w-4 h-4"></i>
+            <span>Kirim Pesan WhatsApp Sekarang</span>
+          </button>
+
+          <!-- Result Log Box -->
+          <div id="boxWaResult" class="hidden p-3 rounded-2xl bg-stone-50 border border-stone-200 text-xs font-mono">
+            <span class="font-bold text-stone-700 block mb-1">Hasil Respon Server:</span>
+            <p id="txtWaResultLog" class="text-stone-600 break-words leading-relaxed"></p>
+          </div>
+        </div>
+
       </div>
     </div>
 
