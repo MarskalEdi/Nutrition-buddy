@@ -457,6 +457,12 @@ function fallbackAIResponse(msg) {
         </button>
       </div>
     </div>`;
+  } else if (q.includes('api') || q.includes('key') || q.includes('kunci') || q.includes('token') || q.includes('setting') || q.includes('pengaturan')) {
+    text = `Untuk memasukkan <strong>Google Gemini API Key</strong> atau <strong>Token WhatsApp (Fonnte)</strong>:<br><br>
+    Silakan klik tombol di bawah untuk langsung membuka tab input kunci API:<br><br>
+    <button onclick="openConfigModal('keys')" class="w-full py-2.5 rounded-xl bg-[#1A1B22] text-white font-extrabold text-xs shadow-md active:scale-95 transition flex items-center justify-center gap-1.5">
+      <span>🔑 Buka Pengaturan Kunci API Sekarang</span>
+    </button>`;
   } else if (q.includes('camilan') || q.includes('snack') || q.includes('dessert') || q.includes('buah') || q.includes('semangka')) {
     text = `Pilihan camilan sehat &amp; rendah kalori untuk program defisit Anda:<br>• <strong>Semangka Segar (150g)</strong>: ~45 kcal, 92% air hidrasi &amp; elektrolit.<br>• <strong>Apel Fuji (1 buah)</strong>: ~95 kcal, tinggi serat pektin yang mengenyangkan.<br>• <strong>1 Butir Telur Rebus</strong>: ~78 kcal, 6.5g protein murni.<br>• <strong>Greek Yogurt Plain (100g)</strong>: ~60 kcal, 10g protein.<br><br>💡 <em>Tips:</em> Buah berair seperti semangka adalah pilihan penutup terbaik karena memuaskan rasa manis tanpa memicu lonjakan gula darah!`;
   } else if (q.includes('telur') || q.includes('egg')) {
@@ -1022,13 +1028,12 @@ async function postToGAS(action, payload) {
   return await response.json();
 }
 
-function openConfigModal() {
+function openConfigModal(initialTab = 'gas') {
   document.getElementById('inputGasUrl').value = localStorage.getItem('NUTRITRACK_GAS_URL') || CONFIG.GAS_URL || '';
   document.getElementById('inputTestWaTarget').value = AppState.user.nomor_wa || '';
   document.getElementById('modalConfig').classList.remove('hidden');
-  if (CONFIG.GAS_URL) {
-    checkApiKeysStatus();
-  }
+  switchConfigTab(initialTab);
+  checkApiKeysStatus();
 }
 
 function closeConfigModal() {
