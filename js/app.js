@@ -81,7 +81,8 @@ function navigateToTab(tabId) {
   const navBtns = {
     home: document.getElementById('navBtnHome'),
     workout: document.getElementById('navBtnWorkout'),
-    coach: document.getElementById('navBtnCoach')
+    coach: document.getElementById('navBtnCoach'),
+    profile: document.getElementById('navBtnProfile')
   };
 
   Object.values(navBtns).forEach(b => {
@@ -94,18 +95,31 @@ function navigateToTab(tabId) {
 
   if (tabId === 'home') {
     document.getElementById('viewHome').classList.remove('hidden');
-    navBtns.home.className = 'nav-item flex flex-col items-center gap-1 text-[#1A1B22] transition';
-    navBtns.home.innerHTML = `<i data-lucide="home" class="w-5 h-5"></i><span class="w-1.5 h-1.5 rounded-full bg-[#8BC34A]"></span>`;
+    if (navBtns.home) {
+      navBtns.home.className = 'nav-item flex flex-col items-center gap-1 text-[#1A1B22] transition';
+      navBtns.home.innerHTML = `<i data-lucide="home" class="w-5 h-5"></i><span class="w-1.5 h-1.5 rounded-full bg-[#8BC34A]"></span>`;
+    }
   } else if (tabId === 'workout') {
     document.getElementById('viewWorkout').classList.remove('hidden');
-    navBtns.workout.className = 'nav-item flex flex-col items-center gap-1 text-[#1A1B22] transition';
-    navBtns.workout.innerHTML = `<i data-lucide="dumbbell" class="w-5 h-5 text-[#8BC34A]"></i><span class="text-[9px] font-extrabold uppercase text-[#8BC34A]">Workout</span>`;
+    if (navBtns.workout) {
+      navBtns.workout.className = 'nav-item flex flex-col items-center gap-1 text-[#1A1B22] transition';
+      navBtns.workout.innerHTML = `<i data-lucide="dumbbell" class="w-5 h-5 text-[#8BC34A]"></i><span class="text-[9px] font-extrabold uppercase text-[#8BC34A]">Workout</span>`;
+    }
   } else if (tabId === 'scanner') {
     document.getElementById('viewScanner').classList.remove('hidden');
   } else if (tabId === 'coach') {
     document.getElementById('viewCoach').classList.remove('hidden');
-    navBtns.coach.className = 'nav-item flex flex-col items-center gap-1 text-[#1A1B22] transition';
-    navBtns.coach.innerHTML = `<i data-lucide="message-square" class="w-5 h-5 text-[#8BC34A]"></i><span class="text-[9px] font-extrabold uppercase text-[#8BC34A]">Coach</span>`;
+    if (navBtns.coach) {
+      navBtns.coach.className = 'nav-item flex flex-col items-center gap-1 text-[#1A1B22] transition';
+      navBtns.coach.innerHTML = `<i data-lucide="message-square" class="w-5 h-5 text-[#8BC34A]"></i><span class="text-[9px] font-extrabold uppercase text-[#8BC34A]">Coach</span>`;
+    }
+  } else if (tabId === 'profile') {
+    document.getElementById('viewProfile').classList.remove('hidden');
+    if (navBtns.profile) {
+      navBtns.profile.className = 'nav-item flex flex-col items-center gap-1 text-[#1A1B22] transition';
+      navBtns.profile.innerHTML = `<i data-lucide="user" class="w-5 h-5 text-[#8BC34A]"></i><span class="text-[9px] font-extrabold uppercase text-[#8BC34A]">Profil</span>`;
+    }
+    populateProfileView();
   }
 
   if (window.lucide) lucide.createIcons();
@@ -124,6 +138,15 @@ function renderCalorieHero() {
   document.getElementById('txtConsumedCalories').innerText = consumed.toLocaleString();
   document.getElementById('txtLeftCalories').innerText = `${left.toLocaleString()} LEFT`;
   document.getElementById('txtCaloriePercent').innerText = `${percent}% Completed`;
+
+  const topBarGreeting = document.getElementById('topBarUserGreeting');
+  if (topBarGreeting) {
+    topBarGreeting.innerText = `HI, ${(AppState.user.nama || 'Brooks').toUpperCase()}`;
+  }
+  const coachRemaining = document.getElementById('coachRemainingKcal');
+  if (coachRemaining) {
+    coachRemaining.innerText = `${left.toLocaleString()} kcal`;
+  }
 
   // SVG Ring Offset (circumference = 251.2)
   const circle = document.getElementById('calorieRingSvg');
@@ -404,6 +427,221 @@ function saveBmiTdeePlan() {
 
   closeBmiTdeeModal();
   alert(`Rencana berhasil diterapkan! Target kalori harian Anda telah disesuaikan menjadi ${plan.targetCalories.toLocaleString()} kcal (Defisit -${plan.deficitLevel} kcal/hari).`);
+}
+
+// ========================================================================
+// 3C. PERSONAL PROFILE VIEW CONTROLLER
+// ========================================================================
+let currentProfileGender = 'L';
+let currentProfileDeficit = 500;
+let lastCalculatedProfilePlan = null;
+
+function populateProfileView() {
+  const u = AppState.user;
+  currentProfileGender = u.gender || 'L';
+  currentProfileDeficit = u.deficitLevel || 500;
+
+  // Header Hero Card
+  const heroName = document.getElementById('profileDisplayName');
+  const heroPhone = document.getElementById('profileDisplayPhone');
+  const heroTarget = document.getElementById('profileHeroTargetBb');
+  const heroDeficit = document.getElementById('profileHeroDeficit');
+
+  if (heroName) heroName.innerText = u.nama || 'Brooks';
+  if (heroPhone) heroPhone.innerText = `WhatsApp: ${u.nomor_wa || '081234567890'}`;
+  if (heroTarget) heroTarget.innerText = `${(u.targetWeightKg || 68.0).toFixed(1)} kg`;
+  if (heroDeficit) heroDeficit.innerText = `-${u.deficitLevel || 500} kcal`;
+
+  // Form Inputs
+  const inpName = document.getElementById('profileInputName');
+  const inpPhone = document.getElementById('profileInputPhone');
+  const inpAge = document.getElementById('profileInputAge');
+  const inpHeight = document.getElementById('profileInputHeight');
+  const inpWeight = document.getElementById('profileInputWeight');
+  const inpTargetWeight = document.getElementById('profileInputTargetWeight');
+  const inpActivity = document.getElementById('profileInputActivity');
+
+  if (inpName) inpName.value = u.nama || 'Brooks';
+  if (inpPhone) inpPhone.value = u.nomor_wa || '081234567890';
+  if (inpAge) inpAge.value = u.age || 28;
+  if (inpHeight) inpHeight.value = u.heightCm || 175;
+  if (inpWeight) inpWeight.value = u.weightKg || 74.2;
+  if (inpTargetWeight) inpTargetWeight.value = u.targetWeightKg || 68.0;
+  if (inpActivity) inpActivity.value = u.activityLevel || 1.375;
+
+  selectProfileGender(currentProfileGender, false);
+  selectProfileDeficit(currentProfileDeficit, false);
+  updateProfileLiveMetrics();
+}
+
+function selectProfileGender(gender, triggerUpdate = true) {
+  currentProfileGender = gender;
+  const btnL = document.getElementById('profBtnGenderL');
+  const btnP = document.getElementById('profBtnGenderP');
+
+  if (btnL && btnP) {
+    if (gender === 'L') {
+      btnL.className = 'py-2.5 rounded-xl border-2 border-[#1A1B22] bg-[#1A1B22] text-white text-xs font-extrabold transition flex items-center justify-center gap-1.5 active:scale-95';
+      btnP.className = 'py-2.5 rounded-xl border border-stone-200 text-stone-700 text-xs font-extrabold transition flex items-center justify-center gap-1.5 active:scale-95';
+    } else {
+      btnP.className = 'py-2.5 rounded-xl border-2 border-[#1A1B22] bg-[#1A1B22] text-white text-xs font-extrabold transition flex items-center justify-center gap-1.5 active:scale-95';
+      btnL.className = 'py-2.5 rounded-xl border border-stone-200 text-stone-700 text-xs font-extrabold transition flex items-center justify-center gap-1.5 active:scale-95';
+    }
+  }
+
+  if (triggerUpdate) updateProfileLiveMetrics();
+}
+
+function selectProfileDeficit(deficit, triggerUpdate = true) {
+  currentProfileDeficit = Number(deficit);
+  const btn250 = document.getElementById('profBtnDeficit250');
+  const btn500 = document.getElementById('profBtnDeficit500');
+  const btn750 = document.getElementById('profBtnDeficit750');
+
+  const inactiveClass = 'p-2 rounded-xl border border-stone-200 text-stone-700 text-center transition active:scale-95';
+  const activeClass = 'p-2 rounded-xl border-2 border-[#1A1B22] bg-[#1A1B22] text-white text-center transition shadow-xs active:scale-95';
+
+  if (btn250 && btn500 && btn750) {
+    btn250.className = currentProfileDeficit === 250 ? activeClass : inactiveClass;
+    btn500.className = currentProfileDeficit === 500 ? activeClass : inactiveClass;
+    btn750.className = currentProfileDeficit === 750 ? activeClass : inactiveClass;
+  }
+
+  if (triggerUpdate) updateProfileLiveMetrics();
+}
+
+function onProfileInputsChanged() {
+  updateProfileLiveMetrics();
+}
+
+function updateProfileLiveMetrics() {
+  const age = Number(document.getElementById('profileInputAge')?.value) || 28;
+  const height = Number(document.getElementById('profileInputHeight')?.value) || 175;
+  const weight = Number(document.getElementById('profileInputWeight')?.value) || 74.2;
+  const targetWeight = Number(document.getElementById('profileInputTargetWeight')?.value) || 68.0;
+  const activityLevel = Number(document.getElementById('profileInputActivity')?.value) || 1.375;
+
+  const plan = calculateBmiTdeePlan(weight, height, age, currentProfileGender, activityLevel, currentProfileDeficit, targetWeight);
+  lastCalculatedProfilePlan = plan;
+
+  // Render metrics
+  const bmiVal = document.getElementById('profResBmiValue');
+  const bmiBadge = document.getElementById('profResBmiBadge');
+  const idealRange = document.getElementById('profResIdealRange');
+  const bmrVal = document.getElementById('profResBmrValue');
+  const tdeeVal = document.getElementById('profResTdeeValue');
+  const targetCalVal = document.getElementById('profResTargetCalorieValue');
+  const deficitVal = document.getElementById('profResDeficitValue');
+  const timelineText = document.getElementById('profResTimelineText');
+  const weightDiff = document.getElementById('profTxtWeightDifference');
+  const macroP = document.getElementById('profResMacroProtein');
+  const macroF = document.getElementById('profResMacroFat');
+  const macroC = document.getElementById('profResMacroCarbs');
+
+  if (bmiVal) bmiVal.innerText = plan.bmi.toFixed(1);
+  if (bmiBadge) {
+    bmiBadge.innerText = plan.bmiCategory;
+    bmiBadge.className = `px-2.5 py-0.5 rounded-full text-[10px] font-extrabold ${plan.bmiBadgeClass}`;
+  }
+  if (idealRange) idealRange.innerText = `${plan.idealWeightMin} – ${plan.idealWeightMax} kg`;
+  if (bmrVal) bmrVal.innerText = plan.bmr.toLocaleString();
+  if (tdeeVal) tdeeVal.innerText = plan.tdee.toLocaleString();
+  if (targetCalVal) targetCalVal.innerText = plan.targetCalories.toLocaleString();
+  if (deficitVal) deficitVal.innerText = `-${plan.deficitLevel} kcal`;
+
+  if (weightDiff) {
+    if (plan.weightToLose > 0) {
+      weightDiff.innerText = `Turun ${plan.weightToLose} kg`;
+      weightDiff.className = 'text-green-600 font-extrabold';
+    } else {
+      weightDiff.innerText = 'Target Tercapai';
+      weightDiff.className = 'text-stone-400 font-bold';
+    }
+  }
+
+  if (timelineText) {
+    if (plan.weightToLose > 0) {
+      const months = (plan.weeksEstimate / 4.3).toFixed(1);
+      timelineText.innerHTML = `
+        <i data-lucide="calendar" class="w-4 h-4 text-[#8BC34A] shrink-0"></i>
+        <span>Target turun <strong>${plan.weightToLose} kg</strong> tercapai dalam <strong>~${plan.weeksEstimate} minggu (~${months} bulan)</strong></span>
+      `;
+    } else {
+      timelineText.innerHTML = `
+        <i data-lucide="check-circle" class="w-4 h-4 text-[#8BC34A] shrink-0"></i>
+        <span>Selamat! Berat badan Anda sudah berada di atau di bawah target (${targetWeight} kg).</span>
+      `;
+    }
+  }
+
+  if (macroP) macroP.innerText = `${plan.macros.proteinG}g`;
+  if (macroF) macroF.innerText = `${plan.macros.fatG}g`;
+  if (macroC) macroC.innerText = `${plan.macros.carbsG}g`;
+
+  if (window.lucide) lucide.createIcons();
+}
+
+function saveUserProfile() {
+  const age = Number(document.getElementById('profileInputAge')?.value) || 28;
+  const height = Number(document.getElementById('profileInputHeight')?.value) || 175;
+  const weight = Number(document.getElementById('profileInputWeight')?.value) || 74.2;
+  const targetWeight = Number(document.getElementById('profileInputTargetWeight')?.value) || 68.0;
+  const activityLevel = Number(document.getElementById('profileInputActivity')?.value) || 1.375;
+
+  const plan = lastCalculatedProfilePlan || calculateBmiTdeePlan(
+    weight, height, age, currentProfileGender, activityLevel, currentProfileDeficit, targetWeight
+  );
+
+  const u = AppState.user;
+  u.nama = document.getElementById('profileInputName')?.value.trim() || 'Brooks';
+  u.nomor_wa = document.getElementById('profileInputPhone')?.value.trim() || '6281234567890';
+  u.age = age;
+  u.heightCm = height;
+  u.weightKg = weight;
+  u.currentBB = weight;
+  u.targetWeightKg = targetWeight;
+  u.activityLevel = activityLevel;
+  u.gender = currentProfileGender;
+  u.deficitLevel = plan.deficitLevel;
+
+  u.bmi = plan.bmi;
+  u.bmiCategory = plan.bmiCategory;
+  u.bmr = plan.bmr;
+  u.tdee = plan.tdee;
+  u.targetCalories = plan.targetCalories;
+
+  // Perbarui UI di Home & Hero
+  renderCalorieHero();
+  renderBmiTdeeCard();
+  saveCachedState();
+
+  // Sinkronkan ke Google Sheets backend jika online
+  if (CONFIG.GAS_URL) {
+    postToGAS('save_user_profile', {
+      user_id: u.nomor_wa,
+      nama: u.nama,
+      berat_badan: u.weightKg,
+      tinggi_badan: u.heightCm,
+      usia: u.age,
+      gender: u.gender,
+      bmi: u.bmi,
+      tdee: u.tdee,
+      target_bb: u.targetWeightKg,
+      target_kalori: u.targetCalories
+    }).catch(e => console.log('Sync profile to GAS warning:', e));
+  }
+
+  // Perbarui tampilan hero di Profil
+  const heroName = document.getElementById('profileDisplayName');
+  const heroPhone = document.getElementById('profileDisplayPhone');
+  const heroTarget = document.getElementById('profileHeroTargetBb');
+  const heroDeficit = document.getElementById('profileHeroDeficit');
+  if (heroName) heroName.innerText = u.nama;
+  if (heroPhone) heroPhone.innerText = `WhatsApp: ${u.nomor_wa}`;
+  if (heroTarget) heroTarget.innerText = `${u.targetWeightKg.toFixed(1)} kg`;
+  if (heroDeficit) heroDeficit.innerText = `-${u.deficitLevel} kcal`;
+
+  alert(`Profil ${u.nama} berhasil disimpan! Target kalori harian Anda telah disesuaikan menjadi ${plan.targetCalories.toLocaleString()} kcal (Defisit -${plan.deficitLevel} kcal/hari).`);
 }
 
 function renderWaterGlasses() {

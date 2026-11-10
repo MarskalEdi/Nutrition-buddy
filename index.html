@@ -71,22 +71,18 @@
       
       <!-- Top App Bar -->
       <header class="px-5 pt-4 pb-2 flex justify-between items-center bg-[#F9F9F7] sticky top-0 z-30">
-        <div class="flex items-center gap-3">
-          <div onclick="openBmiTdeeModal()" class="w-11 h-11 rounded-full bg-stone-200 overflow-hidden border-2 border-[#8BC34A] shadow-xs relative cursor-pointer active:scale-95 transition" title="Profil BMI & Target Berat Badan">
-            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" alt="Avatar" class="w-full h-full object-cover">
+        <div onclick="navigateToTab('profile')" class="flex items-center gap-3 cursor-pointer group" title="Buka Profil Pribadi">
+          <div class="w-11 h-11 rounded-full bg-stone-200 overflow-hidden border-2 border-[#8BC34A] shadow-xs relative active:scale-95 transition group-hover:ring-2 group-hover:ring-[#8BC34A]">
+            <img id="topBarAvatarImg" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" alt="Avatar" class="w-full h-full object-cover">
             <span class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-[#8BC34A] border-2 border-white"></span>
           </div>
           <div>
-            <p class="text-[10px] font-bold tracking-widest text-stone-500 uppercase">HI, BROOKS</p>
+            <p id="topBarUserGreeting" class="text-[10px] font-bold tracking-widest text-stone-500 uppercase">HI, BROOKS</p>
             <h2 class="text-base font-extrabold text-[#1A1B22] leading-tight">Welcome Back!</h2>
           </div>
         </div>
-        <div class="flex items-center gap-1.5">
-          <button onclick="openConfigModal('keys')" class="px-3 py-1.5 rounded-full bg-white border border-[#E8E7EC] flex items-center gap-1.5 text-xs font-extrabold text-[#1A1B22] shadow-xs active:scale-95 transition">
-            <i data-lucide="key" class="w-3.5 h-3.5 text-[#8BC34A]"></i>
-            <span>Kunci API</span>
-          </button>
-          <button onclick="openConfigModal('gas')" title="Pengaturan Server GAS" class="w-9 h-9 rounded-full bg-white border border-[#E8E7EC] flex items-center justify-center text-stone-700 shadow-xs active:scale-95 transition">
+        <div class="flex items-center gap-2">
+          <button onclick="openConfigModal()" title="Pengaturan Server &amp; Kunci API" class="w-9 h-9 rounded-full bg-white border border-[#E8E7EC] flex items-center justify-center text-stone-700 shadow-xs active:scale-95 transition hover:border-[#8BC34A]">
             <i data-lucide="settings" class="w-4 h-4"></i>
           </button>
           <button class="w-9 h-9 rounded-full bg-white border border-[#E8E7EC] flex items-center justify-center text-stone-700 shadow-xs relative active:scale-95 transition">
@@ -154,7 +150,7 @@
         </div>
 
         <!-- BMI, TDEE & TARGET DEFISIT SUMMARY WIDGET -->
-        <div onclick="openBmiTdeeModal()" class="bg-white border border-[#E8E7EC] rounded-2xl p-3.5 shadow-xs flex items-center justify-between cursor-pointer hover:border-[#8BC34A] transition active:scale-[0.99]" title="Klik untuk menghitung BMI & TDEE">
+        <div onclick="navigateToTab('profile')" class="bg-white border border-[#E8E7EC] rounded-2xl p-3.5 shadow-xs flex items-center justify-between cursor-pointer hover:border-[#8BC34A] transition active:scale-[0.99]" title="Klik untuk membuka Profil Pribadi &amp; BMI">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-2xl bg-[#F1F8E9] border border-green-200/80 flex items-center justify-center text-[#2E7D32] shrink-0">
               <i data-lucide="scale" class="w-5 h-5 text-[#8BC34A]"></i>
@@ -171,7 +167,7 @@
             </div>
           </div>
           <div class="flex items-center text-xs font-bold text-[#8BC34A] gap-1 shrink-0">
-            <span class="text-[11px] font-extrabold">Atur BMI</span>
+            <span class="text-[11px] font-extrabold">Lihat Profil</span>
             <i data-lucide="chevron-right" class="w-4 h-4"></i>
           </div>
         </div>
@@ -653,9 +649,8 @@
               </p>
             </div>
           </div>
-          <button onclick="openConfigModal('keys')" class="px-3 py-1.5 rounded-full bg-stone-100 hover:bg-stone-200 flex items-center gap-1.5 text-xs font-bold text-[#1A1B22] active:scale-95 transition border border-stone-200">
-            <i data-lucide="key" class="w-3.5 h-3.5 text-[#8BC34A]"></i>
-            <span>Atur API Key</span>
+          <button onclick="openConfigModal()" title="Pengaturan Server &amp; Kunci API" class="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center text-stone-600 hover:text-[#1A1B22] active:scale-95 transition">
+            <i data-lucide="settings" class="w-4 h-4"></i>
           </button>
         </div>
 
@@ -665,7 +660,7 @@
             <i data-lucide="activity" class="w-4 h-4 text-[#2E7D32]"></i>
             <div>
               <span class="text-[10px] font-extrabold text-stone-500 uppercase tracking-wider block">ACTIVE CALORIE CONTEXT • BROOKS</span>
-              <span class="text-[#1A1B22] font-bold"><strong>540 kcal</strong> remaining • Target: -500 kcal deficit</span>
+              <span class="text-[#1A1B22] font-bold"><strong id="coachRemainingKcal">540 kcal</strong> sisa jatah • Target defisit aktif</span>
             </div>
           </div>
           <span class="px-2 py-0.5 rounded-full bg-white text-[#2E7D32] text-[10px] font-extrabold shadow-xs">Active</span>
@@ -682,21 +677,7 @@
           </div>
           <div class="bg-white border border-[#E8E7EC] rounded-2xl rounded-tl-xs p-3.5 text-xs text-[#1A1B22] max-w-[85%] leading-relaxed shadow-xs space-y-2">
             <p>Halo! ☀️ Saya <strong>FitLife AI Coach</strong>, asisten nutrisi &amp; diet virtual Anda.</p>
-            <p class="text-stone-600">Jatah kalori Anda hari ini adalah <strong class="text-[#2E7D32]">1,960 kcal</strong> dengan target defisit <strong>-500 kcal</strong>. Tanyakan apa saja seputar rekomendasi menu warung, kalori makanan Indonesia, atau cara menjaga defisit kalori hari ini!</p>
-            
-            <!-- Direct Action Box to Enter API Key -->
-            <div class="p-2.5 bg-stone-50 rounded-xl border border-stone-200 space-y-1.5 mt-2">
-              <div class="flex items-center justify-between">
-                <span class="text-[10px] font-extrabold text-stone-600 uppercase tracking-wider">PENGATURAN API KEY:</span>
-                <span id="txtChatGeminiBadge" class="text-[9px] bg-green-100 text-[#2E7D32] px-2 py-0.5 rounded-full font-extrabold">Aktif</span>
-              </div>
-              <p class="text-[11px] text-stone-600 leading-tight">Klik tombol di bawah untuk memasukkan <strong>Google Gemini API Key</strong> atau <strong>Token WhatsApp (Fonnte)</strong> Anda:</p>
-              <button onclick="openConfigModal('keys')" class="w-full py-2 rounded-xl bg-[#1A1B22] text-white font-extrabold text-xs flex items-center justify-center gap-1.5 active:scale-95 transition shadow-xs">
-                <i data-lucide="key" class="w-3.5 h-3.5 text-[#8BC34A]"></i>
-                <span>Masukkan Kunci API Di Sini</span>
-              </button>
-            </div>
-
+            <p class="text-stone-600">Jatah kalori Anda hari ini telah disinkronkan dengan target defisit harian. Tanyakan apa saja seputar rekomendasi menu warung, analisis kalori makanan, atau tips menjaga konsistensi defisit hari ini!</p>
             <span class="block text-[10px] text-stone-400 mt-1 text-right">Baru saja</span>
           </div>
         </div>
@@ -736,6 +717,297 @@
         </button>
       </div>
 
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- VIEW 5: PERSONAL PROFILE & METABOLISME (SCREEN DEDIKASI) -->
+    <!-- ================================================================= -->
+    <section id="viewProfile" class="app-view flex-1 flex flex-col overflow-y-auto no-scrollbar hidden bg-[#F9F9F7] pb-24">
+      
+      <!-- Top Bar Sticky -->
+      <header class="px-5 pt-4 pb-2 flex justify-between items-center bg-[#F9F9F7] sticky top-0 z-30 border-b border-[#E8E7EC]/80">
+        <button onclick="navigateToTab('home')" class="w-9 h-9 rounded-full bg-white border border-[#E8E7EC] flex items-center justify-center text-stone-700 shadow-xs active:scale-95 transition">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        </button>
+        <div class="text-center">
+          <p class="text-[10px] font-bold text-stone-400 uppercase tracking-widest">NUTRITRACK &amp; FITLIFE</p>
+          <h2 class="text-base font-extrabold text-[#1A1B22]">Profil Pribadi</h2>
+        </div>
+        <button onclick="openConfigModal()" title="Pengaturan Server &amp; Kunci API" class="w-9 h-9 rounded-full bg-white border border-[#E8E7EC] flex items-center justify-center text-stone-700 shadow-xs active:scale-95 transition hover:border-[#8BC34A]">
+          <i data-lucide="settings" class="w-4 h-4"></i>
+        </button>
+      </header>
+
+      <div class="px-5 space-y-4 pt-3">
+
+        <!-- 1. HERO PROFILE CARD -->
+        <div class="bg-white rounded-3xl p-5 border border-[#E8E7EC] shadow-xs relative overflow-hidden">
+          <div class="absolute -right-10 -bottom-10 w-36 h-36 bg-[#F1F8E9] rounded-full pointer-events-none"></div>
+          <div class="flex items-center gap-4 relative z-10">
+            <div class="relative">
+              <div class="w-18 h-18 rounded-full bg-stone-200 overflow-hidden border-3 border-[#8BC34A] shadow-md">
+                <img id="profileHeroAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=180&q=80" alt="Avatar Brooks" class="w-full h-full object-cover">
+              </div>
+              <button onclick="alert('Fitur ganti foto profil avatar segera hadir!')" class="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-[#1A1B22] text-white flex items-center justify-center shadow-xs text-[10px]">
+                <i data-lucide="camera" class="w-3 h-3 text-[#8BC34A]"></i>
+              </button>
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <h3 id="profileDisplayName" class="text-lg font-extrabold text-[#1A1B22]">Brooks</h3>
+                <span class="px-2 py-0.5 rounded-full bg-green-100 text-[#2E7D32] text-[9px] font-extrabold">Active Diet</span>
+              </div>
+              <p id="profileDisplayPhone" class="text-xs font-semibold text-stone-500 mt-0.5">WhatsApp: 081234567890</p>
+              <div class="flex items-center gap-2 mt-2">
+                <span class="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-stone-100 text-stone-700 border border-stone-200">
+                  Target: <strong id="profileHeroTargetBb">68.0 kg</strong>
+                </span>
+                <span class="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-[#F1F8E9] text-[#2E7D32] border border-green-200">
+                  Defisit <strong id="profileHeroDeficit">-500 kcal</strong>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. DATA FISIK PENGGUNA (FORM EDIT INTERAKTIF) -->
+        <div class="bg-white rounded-3xl p-5 border border-[#E8E7EC] shadow-xs space-y-4">
+          <div class="flex justify-between items-center pb-2 border-b border-stone-100">
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 rounded-xl bg-lime-100 flex items-center justify-center text-[#2E7D32]">
+                <i data-lucide="user-check" class="w-4 h-4 text-[#8BC34A]"></i>
+              </div>
+              <h4 class="text-sm font-extrabold text-[#1A1B22]">Data Fisik &amp; Antropometri</h4>
+            </div>
+            <span class="text-[10px] text-stone-400 font-bold">Kalkulasi Otomatis</span>
+          </div>
+
+          <!-- Nama & No WA -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[11px] font-bold text-stone-600 mb-1">Nama Panggilan</label>
+              <input id="profileInputName" type="text" value="Brooks" oninput="onProfileInputsChanged()" class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-xs text-stone-800 font-bold focus:outline-none focus:ring-2 focus:ring-[#8BC34A]">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-stone-600 mb-1">No. WhatsApp</label>
+              <input id="profileInputPhone" type="tel" value="081234567890" oninput="onProfileInputsChanged()" class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-xs text-stone-800 font-bold focus:outline-none focus:ring-2 focus:ring-[#8BC34A]">
+            </div>
+          </div>
+
+          <!-- Gender Toggle -->
+          <div>
+            <label class="block text-[11px] font-bold text-stone-600 mb-1">Jenis Kelamin</label>
+            <div class="grid grid-cols-2 gap-2">
+              <button type="button" id="profBtnGenderL" onclick="selectProfileGender('L')" class="py-2.5 rounded-xl border-2 border-[#1A1B22] bg-[#1A1B22] text-white text-xs font-extrabold transition flex items-center justify-center gap-1.5 active:scale-95">
+                <span>👨 Laki-laki</span>
+              </button>
+              <button type="button" id="profBtnGenderP" onclick="selectProfileGender('P')" class="py-2.5 rounded-xl border border-stone-200 text-stone-700 text-xs font-extrabold transition flex items-center justify-center gap-1.5 active:scale-95">
+                <span>👩 Perempuan</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Usia, Tinggi, Berat -->
+          <div class="grid grid-cols-3 gap-2.5">
+            <div>
+              <label class="block text-[11px] font-bold text-stone-600 mb-1">Usia (Thn)</label>
+              <input id="profileInputAge" type="number" value="28" min="12" max="100" oninput="onProfileInputsChanged()" class="w-full px-3 py-2.5 rounded-xl border border-stone-300 text-xs text-stone-800 font-bold text-center focus:outline-none focus:ring-2 focus:ring-[#8BC34A]">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-stone-600 mb-1">Tinggi (cm)</label>
+              <input id="profileInputHeight" type="number" value="175" min="100" max="250" oninput="onProfileInputsChanged()" class="w-full px-3 py-2.5 rounded-xl border border-stone-300 text-xs text-stone-800 font-bold text-center focus:outline-none focus:ring-2 focus:ring-[#8BC34A]">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-stone-600 mb-1">Berat (kg)</label>
+              <input id="profileInputWeight" type="number" step="0.1" value="74.2" min="30" max="250" oninput="onProfileInputsChanged()" class="w-full px-3 py-2.5 rounded-xl border border-stone-300 text-xs text-stone-800 font-bold text-center focus:outline-none focus:ring-2 focus:ring-[#8BC34A]">
+            </div>
+          </div>
+
+          <!-- Tingkat Aktivitas Harian -->
+          <div>
+            <label class="block text-[11px] font-bold text-stone-600 mb-1">Tingkat Aktivitas Fisik</label>
+            <select id="profileInputActivity" onchange="onProfileInputsChanged()" class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-xs text-stone-800 font-bold focus:outline-none focus:ring-2 focus:ring-[#8BC34A] bg-white">
+              <option value="1.2">Sedentari (Jarang berolahraga / kerja meja)</option>
+              <option value="1.375" selected>Ringan (Olahraga ringan 1–3 hari/minggu)</option>
+              <option value="1.55">Moderat (Olahraga sedang 3–5 hari/minggu)</option>
+              <option value="1.725">Sangat Aktif (Latihan intensif 6–7 hari/minggu)</option>
+            </select>
+          </div>
+
+          <!-- Target Berat Badan & Laju Defisit -->
+          <div class="pt-2 border-t border-stone-100 space-y-3">
+            <div>
+              <label class="block text-[11px] font-bold text-stone-700 mb-1 flex justify-between">
+                <span>Target Berat Badan</span>
+                <span id="profTxtWeightDifference" class="text-stone-400 font-bold">Turun 6.2 kg</span>
+              </label>
+              <div class="relative">
+                <input id="profileInputTargetWeight" type="number" step="0.1" value="68.0" oninput="onProfileInputsChanged()" class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-xs text-stone-800 font-bold focus:outline-none focus:ring-2 focus:ring-[#8BC34A]">
+                <span class="absolute right-3.5 top-2.5 text-xs text-stone-400 font-bold">kg</span>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-bold text-stone-600 mb-1">Pilihan Laju Defisit Kalori Harian</label>
+              <div class="grid grid-cols-3 gap-2">
+                <button type="button" id="profBtnDeficit250" onclick="selectProfileDeficit(250)" class="p-2 rounded-xl border border-stone-200 text-stone-700 text-center transition active:scale-95">
+                  <span class="block text-[9px] font-bold text-stone-400 uppercase">Santai</span>
+                  <strong class="text-xs text-[#1A1B22] block font-extrabold">-250</strong>
+                  <span class="text-[9px] text-stone-500">~0.25 kg/mgg</span>
+                </button>
+                <button type="button" id="profBtnDeficit500" onclick="selectProfileDeficit(500)" class="p-2 rounded-xl border-2 border-[#1A1B22] bg-[#1A1B22] text-white text-center transition shadow-xs active:scale-95">
+                  <span class="block text-[9px] font-bold text-[#8BC34A] uppercase">Standar</span>
+                  <strong class="text-xs text-white block font-extrabold">-500</strong>
+                  <span class="text-[9px] text-stone-300">~0.5 kg/mgg</span>
+                </button>
+                <button type="button" id="profBtnDeficit750" onclick="selectProfileDeficit(750)" class="p-2 rounded-xl border border-stone-200 text-stone-700 text-center transition active:scale-95">
+                  <span class="block text-[9px] font-bold text-orange-400 uppercase">Cepat</span>
+                  <strong class="text-xs text-[#1A1B22] block font-extrabold">-750</strong>
+                  <span class="text-[9px] text-stone-500">~0.75 kg/mgg</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. METRIK METABOLISME & HASIL KALKULASI LIVE -->
+        <div class="bg-white rounded-3xl p-5 border border-[#E8E7EC] shadow-xs space-y-3.5">
+          <div class="flex justify-between items-center pb-2 border-b border-stone-100">
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 rounded-xl bg-green-100 flex items-center justify-center text-[#2E7D32]">
+                <i data-lucide="gauge" class="w-4 h-4 text-[#8BC34A]"></i>
+              </div>
+              <h4 class="text-sm font-extrabold text-[#1A1B22]">Analisis Metabolisme &amp; Target</h4>
+            </div>
+            <span class="text-[10px] text-stone-400 font-bold">Mifflin-St Jeor</span>
+          </div>
+
+          <!-- BMI & Rentang Ideal -->
+          <div class="bg-stone-50 rounded-2xl p-3 border border-stone-200 flex justify-between items-center">
+            <div>
+              <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">BODY MASS INDEX (BMI)</span>
+              <div class="flex items-baseline gap-2 mt-0.5">
+                <span id="profResBmiValue" class="text-2xl font-extrabold text-[#1A1B22]">24.2</span>
+                <span id="profResBmiBadge" class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-green-100 text-[#2E7D32]">Normal (Ideal)</span>
+              </div>
+            </div>
+            <div class="text-right">
+              <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">BERAT IDEAL</span>
+              <p id="profResIdealRange" class="text-xs font-extrabold text-stone-700 mt-0.5">57.0 – 70.0 kg</p>
+            </div>
+          </div>
+
+          <!-- BMR & TDEE -->
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div class="bg-stone-50 p-3 rounded-2xl border border-stone-200">
+              <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">BMR (KALORI BASAL)</span>
+              <p class="font-extrabold text-[#1A1B22] text-sm mt-0.5"><span id="profResBmrValue">1,720</span> <span class="text-[10px] font-semibold text-stone-400">kcal</span></p>
+              <p class="text-[9px] text-stone-400 mt-0.5">Energi minimum organ</p>
+            </div>
+            <div class="bg-stone-50 p-3 rounded-2xl border border-stone-200">
+              <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">TDEE (MAINTENANCE)</span>
+              <p class="font-extrabold text-[#1A1B22] text-sm mt-0.5"><span id="profResTdeeValue">2,365</span> <span class="text-[10px] font-semibold text-stone-400">kcal</span></p>
+              <p class="text-[9px] text-stone-400 mt-0.5">Total bakar harian</p>
+            </div>
+          </div>
+
+          <!-- Target Kalori Harian Bersih & Timeline -->
+          <div class="bg-[#F1F8E9] border border-green-200/90 rounded-2xl p-4 space-y-2.5">
+            <div class="flex justify-between items-center">
+              <div>
+                <span class="text-[10px] font-extrabold text-[#2E7D32] uppercase tracking-wider block">TARGET KALORI HARIAN BARU</span>
+                <div class="flex items-baseline gap-1 mt-0.5">
+                  <span id="profResTargetCalorieValue" class="text-2xl font-extrabold text-[#1A1B22]">1,865</span>
+                  <span class="text-xs font-bold text-stone-600">kcal / hari</span>
+                </div>
+              </div>
+              <div class="text-right">
+                <span class="text-[10px] font-bold text-stone-500 block">Laju Defisit</span>
+                <span id="profResDeficitValue" class="text-xs font-extrabold text-[#FF7043]">-500 kcal</span>
+              </div>
+            </div>
+
+            <!-- Estimasi Durasi -->
+            <p id="profResTimelineText" class="text-xs text-stone-700 font-semibold bg-white/90 p-2.5 rounded-xl border border-green-100 flex items-center gap-2">
+              <i data-lucide="calendar" class="w-4 h-4 text-[#8BC34A] shrink-0"></i>
+              <span>Target turun <strong>6.2 kg</strong> tercapai dalam <strong>~13 minggu (~3 bulan)</strong></span>
+            </p>
+
+            <!-- Rekomendasi Makronutrisi -->
+            <div class="pt-1">
+              <span class="text-[10px] font-bold text-stone-600 block mb-1.5">Rekomendasi Asupan Makronutrisi Harian:</span>
+              <div class="grid grid-cols-3 gap-1.5 text-center text-xs">
+                <div class="bg-white py-2 rounded-xl border border-stone-200 shadow-2xs">
+                  <span class="text-stone-400 block text-[9px] font-bold uppercase">Protein</span>
+                  <span id="profResMacroProtein" class="text-[#2E7D32] font-extrabold text-sm">130g</span>
+                </div>
+                <div class="bg-white py-2 rounded-xl border border-stone-200 shadow-2xs">
+                  <span class="text-stone-400 block text-[9px] font-bold uppercase">Lemak</span>
+                  <span id="profResMacroFat" class="text-stone-700 font-extrabold text-sm">52g</span>
+                </div>
+                <div class="bg-white py-2 rounded-xl border border-stone-200 shadow-2xs">
+                  <span class="text-stone-400 block text-[9px] font-bold uppercase">Karbo</span>
+                  <span id="profResMacroCarbs" class="text-[#FF7043] font-extrabold text-sm">220g</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tombol Simpan Profil -->
+          <button onclick="saveUserProfile()" class="w-full py-4 rounded-full bg-[#1A1B22] text-white font-extrabold text-sm shadow-xl active:scale-95 transition flex items-center justify-center gap-2 hover:bg-black">
+            <i data-lucide="check-circle" class="w-4 h-4 text-[#8BC34A]"></i>
+            <span>Simpan &amp; Terapkan Profil Baru</span>
+          </button>
+        </div>
+
+        <!-- 4. PUSAT PENGATURAN & PREFERENSI (CLEAN INTEGRATED MENU) -->
+        <div class="bg-white rounded-3xl p-5 border border-[#E8E7EC] shadow-xs space-y-2">
+          <h4 class="text-xs font-extrabold text-stone-400 uppercase tracking-wider pb-1">PENGATURAN &amp; FITUR</h4>
+
+          <!-- Menu 1: Pengaturan Server & Kunci API -->
+          <div onclick="openConfigModal()" class="p-3.5 rounded-2xl hover:bg-stone-50 border border-stone-200 flex items-center justify-between cursor-pointer transition active:scale-[0.99]">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-stone-100 flex items-center justify-center text-stone-700">
+                <i data-lucide="sliders" class="w-4 h-4 text-[#8BC34A]"></i>
+              </div>
+              <div>
+                <h5 class="text-xs font-extrabold text-[#1A1B22]">Pengaturan Server &amp; Kunci API</h5>
+                <p class="text-[10px] text-stone-500 font-semibold">Backend GAS, Gemini AI &amp; Token WhatsApp</p>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-stone-400"></i>
+          </div>
+
+          <!-- Menu 2: Laporan Mingguan & Unduh PDF -->
+          <div onclick="openReportModal()" class="p-3.5 rounded-2xl hover:bg-stone-50 border border-stone-200 flex items-center justify-between cursor-pointer transition active:scale-[0.99]">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-stone-100 flex items-center justify-center text-stone-700">
+                <i data-lucide="file-text" class="w-4 h-4 text-[#8BC34A]"></i>
+              </div>
+              <div>
+                <h5 class="text-xs font-extrabold text-[#1A1B22]">Laporan Mingguan &amp; Unduh PDF</h5>
+                <p class="text-[10px] text-stone-500 font-semibold">Grafik asupan kalori &amp; ekspor sertifikat</p>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-stone-400"></i>
+          </div>
+
+          <!-- Menu 3: Chat AI Coach -->
+          <div onclick="navigateToTab('coach')" class="p-3.5 rounded-2xl hover:bg-stone-50 border border-stone-200 flex items-center justify-between cursor-pointer transition active:scale-[0.99]">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-stone-100 flex items-center justify-center text-stone-700">
+                <i data-lucide="message-square" class="w-4 h-4 text-[#8BC34A]"></i>
+              </div>
+              <div>
+                <h5 class="text-xs font-extrabold text-[#1A1B22]">Konsultasi FitLife AI Coach</h5>
+                <p class="text-[10px] text-stone-500 font-semibold">Tanya jawab nutrisi &amp; menu ramah defisit</p>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-stone-400"></i>
+          </div>
+        </div>
+
+      </div>
     </section>
 
     <!-- ================================================================= -->
@@ -1365,10 +1637,10 @@
           <span class="text-[9px] font-extrabold uppercase">Coach</span>
         </button>
 
-        <!-- Tab 5: Report -->
-        <button id="navBtnReport" onclick="openReportModal()" class="nav-item flex flex-col items-center gap-1 text-stone-400 hover:text-[#1A1B22] transition">
-          <i data-lucide="file-text" class="w-5 h-5"></i>
-          <span class="text-[9px] font-extrabold uppercase">Report</span>
+        <!-- Tab 5: Profil -->
+        <button id="navBtnProfile" onclick="navigateToTab('profile')" class="nav-item flex flex-col items-center gap-1 text-stone-400 hover:text-[#1A1B22] transition">
+          <i data-lucide="user" class="w-5 h-5"></i>
+          <span class="text-[9px] font-extrabold uppercase">Profil</span>
         </button>
 
       </div>

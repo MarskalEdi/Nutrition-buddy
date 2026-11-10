@@ -118,7 +118,7 @@ function doPost(e) {
         UserID: body.user_id || 'USR-0001',
         Tanggal: Utilities.formatDate(new Date(), 'Asia/Jakarta', 'yyyy-MM-dd'),
         BeratKg: Number(body.berat_badan) || 74.2,
-        Catatan: `BMI: ${body.bmi || 24.2}, TDEE: ${body.tdee || 2365}, Target BB: ${body.target_bb || 68}kg, Target Kalori: ${body.target_kalori || 1865}`,
+        Catatan: `Nama: ${body.nama || 'Brooks'}, BMI: ${body.bmi || 24.2}, TDEE: ${body.tdee || 2365}, Target BB: ${body.target_bb || 68}kg, Target Kalori: ${body.target_kalori || 1865}`,
         DibuatPada: new Date().toISOString()
       };
       bulkAppendRows_('RiwayatTimbang', [timbangRow]);
