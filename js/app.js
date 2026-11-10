@@ -32,10 +32,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // A. Lucide Icons
   if (window.lucide) lucide.createIcons();
 
-  // B. Registrasi Service Worker PWA
+  // B. Registrasi Service Worker PWA & Auto-Update
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js')
-      .then(reg => console.log('[PWA SW] Terdaftar:', reg.scope))
+      .then(reg => {
+        reg.update();
+        console.log('[PWA SW] Terdaftar & diupdate:', reg.scope);
+      })
       .catch(err => console.warn('[PWA SW] Gagal registrasi:', err));
   }
 

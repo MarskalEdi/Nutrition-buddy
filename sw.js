@@ -1,12 +1,10 @@
 // ========================================================================
 // sw.js: Service Worker NutriTrack & FitLife PWA
-// Cache-First untuk Aset Statis, Network-First untuk Endpoint GAS
+// Versi 3: Network-First untuk Dokumen HTML (Auto-Update), Cache untuk Aset Eksternal
 // ========================================================================
 
-const CACHE_NAME = 'nutritrack-pwa-v1';
+const CACHE_NAME = 'nutritrack-pwa-v3';
 const PRECACHE_ASSETS = [
-  './',
-  './index.html',
   './manifest.json',
   './css/style.css',
   './js/config.js',
@@ -18,13 +16,13 @@ const PRECACHE_ASSETS = [
 ];
 
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('[SW] Pre-caching offline assets');
+      console.log('[SW v3] Pre-caching offline assets');
       return cache.addAll(PRECACHE_ASSETS).catch(err => console.warn('Cache warning:', err));
     })
   );
-  self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
@@ -33,14 +31,13 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         keys.map((k) => {
           if (k !== CACHE_NAME) {
-            console.log('[SW] Clearing old cache', k);
+            console.log('[SW v3] Menghapus cache lama:', k);
             return caches.delete(k);
           }
         })
       );
-    })
+    }).then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
 self.addEventListener('fetch', (event) => {
@@ -48,24 +45,40 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(event.request.url);
 
-  // Jangan cache request ke GAS API secara hard cache (gunakan SWR / network)
-  if (url.origin.includes('script.google.com')) {
+  // 1. Google Apps Script API: Selalu langsung ke network (tanpa cache)
+  if (url.origin.includes('script.google.com') || url.origin.includes('script.googleusercontent.com')) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
+  // 2. Dokumen HTML / Navigasi: WAJIB Network-First agar update langsung terlihat!
+  if (event.request.mode === 'navigate' || event.request.destination === 'document' || url.pathname.endsWith('.html') || url.pathname === '/' || url.pathname.endsWith('/')) {
     event.respondWith(
-      fetch(event.request).catch(() => caches.match(event.request))
+      fetch(event.request)
+        .then((networkRes) => {
+          if (networkRes && networkRes.status === 200) {
+            const clone = networkRes.clone();
+            caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
+          }
+          return networkRes;
+        })
+        .catch(() => caches.match(event.request))
     );
     return;
   }
 
+  // 3. Aset Statis Lainnya (CSS, JS, Font, Gambar): Stale-While-Revalidate
   event.respondWith(
     caches.match(event.request).then((cached) => {
-      if (cached) return cached;
-      return fetch(event.request).then((res) => {
-        if (res && res.status === 200 && res.type === 'basic') {
-          const clone = res.clone();
+      const fetchPromise = fetch(event.request).then((networkRes) => {
+        if (networkRes && networkRes.status === 200) {
+          const clone = networkRes.clone();
           caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
         }
-        return res;
-      });
+        return networkRes;
+      }).catch(() => cached);
+
+      return cached || fetchPromise;
     })
   );
 });
