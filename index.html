@@ -642,104 +642,19 @@
       <!-- Message Stream -->
       <div id="aiChatStream" class="flex-1 p-4 overflow-y-auto space-y-4 no-scrollbar">
         
-        <!-- AI Bubble 1 -->
+        <!-- Welcome Greeting Bubble -->
         <div class="flex gap-2.5 items-start">
           <div class="w-7 h-7 rounded-full bg-[#8BC34A] text-white flex items-center justify-center text-xs shrink-0 mt-1">
             <i data-lucide="bot" class="w-4 h-4"></i>
           </div>
-          <div class="bg-white border border-[#E8E7EC] rounded-2xl rounded-tl-xs p-3.5 text-xs text-[#1A1B22] max-w-[85%] leading-relaxed shadow-xs">
-            Good morning Brooks! ☀️ You've logged <strong>1,420 kcal</strong> so far today with great carb balance. You still have <strong class="text-[#689F38]">540 kcal left</strong> for dinner and an evening snack. What are you craving tonight?
-            <span class="block text-[10px] text-stone-400 mt-1 text-right">10:15 AM</span>
-          </div>
-        </div>
-
-        <!-- User Bubble 1 -->
-        <div class="flex justify-end">
-          <div class="bg-[#1A1B22] text-white rounded-2xl rounded-tr-xs p-3.5 text-xs max-w-[85%] leading-relaxed shadow-xs">
-            I'm heading out to eat near the office. What's a good high-protein option at an Indonesian warung that keeps me under 450 kcal?
-            <span class="block text-[10px] text-stone-400 mt-1 text-right">10:30 AM ✓✓</span>
-          </div>
-        </div>
-
-        <!-- AI Bubble 2 with 2 Warung Recommendations -->
-        <div class="flex gap-2.5 items-start">
-          <div class="w-7 h-7 rounded-full bg-[#8BC34A] text-white flex items-center justify-center text-xs shrink-0 mt-1">
-            <i data-lucide="bot" class="w-4 h-4"></i>
-          </div>
-          <div class="space-y-3 max-w-[85%]">
-            <div class="bg-white border border-[#E8E7EC] rounded-2xl rounded-tl-xs p-3.5 text-xs text-[#1A1B22] leading-relaxed shadow-xs">
-              Here are 2 great high-protein warung choices that easily fit your remaining <strong>540 kcal</strong> budget:
+          <div class="bg-white border border-[#E8E7EC] rounded-2xl rounded-tl-xs p-3.5 text-xs text-[#1A1B22] max-w-[85%] leading-relaxed shadow-xs space-y-2">
+            <p>Halo! ☀️ Saya <strong>FitLife AI Coach</strong>, asisten nutrisi &amp; diet virtual Anda.</p>
+            <p class="text-stone-600">Jatah kalori Anda hari ini adalah <strong class="text-[#2E7D32]">1,960 kcal</strong> dengan target defisit <strong>-500 kcal</strong>. Tanyakan apa saja seputar rekomendasi menu warung, kalori makanan Indonesia, atau cara menjaga defisit kalori hari ini!</p>
+            <div class="pt-1 flex flex-wrap gap-1.5">
+              <span class="text-[10px] bg-green-50 text-[#2E7D32] px-2 py-0.5 rounded-md font-bold">✨ AI Aktif</span>
+              <span class="text-[10px] bg-stone-100 text-stone-600 px-2 py-0.5 rounded-md font-bold">🥗 Kamus Gizi Otomatis</span>
             </div>
-
-            <!-- Warung Card 1: Sate Ayam -->
-            <div class="bg-white border border-[#E8E7EC] rounded-2xl p-3 shadow-xs space-y-2">
-              <div class="flex items-center gap-2.5">
-                <img src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=150&q=80" class="w-12 h-12 rounded-xl object-cover shrink-0">
-                <div class="flex-1">
-                  <div class="flex justify-between items-center">
-                    <span class="px-2 py-0.5 rounded-full bg-green-100 text-[#2E7D32] text-[9px] font-extrabold uppercase">Lean Protein Pick</span>
-                    <span class="text-[10px] text-stone-400 font-bold">10 Tusuk</span>
-                  </div>
-                  <h4 class="text-xs font-extrabold text-[#1A1B22] mt-0.5">Sate Ayam Tanpa Lontong</h4>
-                  <p class="text-[10px] text-stone-500">Light peanut dip &amp; grilled skinless fillet</p>
-                </div>
-              </div>
-              <!-- Macro pills -->
-              <div class="flex gap-1.5 text-[10px] font-bold">
-                <span class="px-2 py-0.5 rounded-md bg-orange-50 text-orange-600">🔥 ~380 kcal</span>
-                <span class="px-2 py-0.5 rounded-md bg-green-50 text-green-700">🥩 36g Protein</span>
-                <span class="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700">🥑 14g Fat</span>
-              </div>
-              <p class="text-[10px] text-stone-500 italic bg-stone-50 p-2 rounded-xl">💡 Pro-tip: Minta bumbu kacang dipisah atau setengah porsi untuk menghemat ~80 kcal.</p>
-              <button onclick="logMealFromAI('Sate Ayam Tanpa Lontong', 380, 36, 14, 12, 'Dinner')" class="w-full py-2 rounded-xl bg-[#8BC34A] text-white font-extrabold text-xs shadow-xs active:scale-95 transition flex items-center justify-center gap-1">
-                <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
-                <span>+ Log as Dinner (380 kcal)</span>
-              </button>
-            </div>
-
-            <!-- Warung Card 2: Soto Ayam Bening -->
-            <div class="bg-white border border-[#E8E7EC] rounded-2xl p-3 shadow-xs space-y-2">
-              <div class="flex items-center gap-2.5">
-                <img src="https://images.unsplash.com/photo-1541832676-9b763b0239ab?auto=format&fit=crop&w=150&q=80" class="w-12 h-12 rounded-xl object-cover shrink-0">
-                <div class="flex-1">
-                  <div class="flex justify-between items-center">
-                    <span class="px-2 py-0.5 rounded-full bg-blue-100 text-[#0288D1] text-[9px] font-extrabold uppercase">Hydrating Broth</span>
-                    <span class="text-[10px] text-stone-400 font-bold">1 Bowl</span>
-                  </div>
-                  <h4 class="text-xs font-extrabold text-[#1A1B22] mt-0.5">Soto Ayam Bening</h4>
-                  <p class="text-[10px] text-stone-500">Tanpa koya, nasi 1/2 porsi, fresh herbs</p>
-                </div>
-              </div>
-              <div class="flex gap-1.5 text-[10px] font-bold">
-                <span class="px-2 py-0.5 rounded-md bg-orange-50 text-orange-600">🔥 ~320 kcal</span>
-                <span class="px-2 py-0.5 rounded-md bg-green-50 text-green-700">🥩 28g Protein</span>
-                <span class="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700">🥑 8g Fat</span>
-              </div>
-              <button onclick="logMealFromAI('Soto Ayam Bening', 320, 28, 8, 32, 'Dinner')" class="w-full py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-800 font-extrabold text-xs active:scale-95 transition flex items-center justify-center gap-1">
-                <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
-                <span>+ Log as Dinner (320 kcal)</span>
-              </button>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- User Bubble 2 -->
-        <div class="flex justify-end">
-          <div class="bg-[#1A1B22] text-white rounded-2xl rounded-tr-xs p-3.5 text-xs max-w-[85%] leading-relaxed shadow-xs">
-            Can I still have a fresh fruit dessert like watermelon afterwards? 🍉
-            <span class="block text-[10px] text-stone-400 mt-1 text-right">10:35 AM ✓✓</span>
-          </div>
-        </div>
-
-        <!-- AI Bubble 3 -->
-        <div class="flex gap-2.5 items-start">
-          <div class="w-7 h-7 rounded-full bg-[#8BC34A] text-white flex items-center justify-center text-xs shrink-0 mt-1">
-            <i data-lucide="bot" class="w-4 h-4"></i>
-          </div>
-          <div class="bg-white border border-[#E8E7EC] rounded-2xl rounded-tl-xs p-3.5 text-xs text-[#1A1B22] max-w-[85%] leading-relaxed shadow-xs">
-            Absolutely! 🍉 <strong>1 cup of diced watermelon (150g)</strong> is only <strong>~45 kcal</strong> and packed with hydration. Adding it to the Sate Ayam keeps you well under your <span class="font-extrabold text-[#2E7D32]">-500 kcal deficit goal!</span> 🎯
-            <span class="block text-[10px] text-stone-400 mt-1 text-right">Just now</span>
+            <span class="block text-[10px] text-stone-400 mt-1 text-right">Baru saja</span>
           </div>
         </div>
 
@@ -747,11 +662,20 @@
 
       <!-- Quick Suggestion Filter Chips -->
       <div class="px-4 py-2 flex gap-2 overflow-x-auto no-scrollbar border-t border-[#E8E7EC] bg-white">
-        <button onclick="triggerQuickAIQuery('Menu makan malam warung under 400 kcal')" class="px-3 py-1 rounded-full bg-stone-100 text-[11px] font-bold text-stone-700 whitespace-nowrap shrink-0 flex items-center gap-1">
-          <span>🍲 High Protein Dinner (&lt; 400 kcal)</span>
+        <button onclick="triggerQuickAIQuery('Rekomendasi menu warung tinggi protein under 400 kcal')" class="px-3 py-1.5 rounded-full bg-stone-100 hover:bg-stone-200 text-[11px] font-bold text-stone-700 whitespace-nowrap shrink-0 flex items-center gap-1 active:scale-95 transition">
+          <span>🍲 Menu Warung (&lt; 400 kcal)</span>
         </button>
-        <button onclick="triggerQuickAIQuery('Rekomendasi warung sekitar')" class="px-3 py-1 rounded-full bg-stone-100 text-[11px] font-bold text-stone-700 whitespace-nowrap shrink-0 flex items-center gap-1">
-          <span>🏪 Warung</span>
+        <button onclick="triggerQuickAIQuery('Berapa kalori dan protein 2 butir telur rebus?')" class="px-3 py-1.5 rounded-full bg-stone-100 hover:bg-stone-200 text-[11px] font-bold text-stone-700 whitespace-nowrap shrink-0 flex items-center gap-1 active:scale-95 transition">
+          <span>🥚 2 Telur Rebus</span>
+        </button>
+        <button onclick="triggerQuickAIQuery('Camilan buah segar apa yang rendah kalori untuk malam hari?')" class="px-3 py-1.5 rounded-full bg-stone-100 hover:bg-stone-200 text-[11px] font-bold text-stone-700 whitespace-nowrap shrink-0 flex items-center gap-1 active:scale-95 transition">
+          <span>🍉 Camilan Rendah Kalori</span>
+        </button>
+        <button onclick="triggerQuickAIQuery('Berapa sisa jatah kalori saya hari ini?')" class="px-3 py-1.5 rounded-full bg-stone-100 hover:bg-stone-200 text-[11px] font-bold text-stone-700 whitespace-nowrap shrink-0 flex items-center gap-1 active:scale-95 transition">
+          <span>🎯 Cek Sisa Kalori</span>
+        </button>
+        <button onclick="triggerQuickAIQuery('Saran olahraga 10 menit tanpa alat untuk bakar lemak')" class="px-3 py-1.5 rounded-full bg-stone-100 hover:bg-stone-200 text-[11px] font-bold text-stone-700 whitespace-nowrap shrink-0 flex items-center gap-1 active:scale-95 transition">
+          <span>🏃 Olahraga 10 Menit</span>
         </button>
       </div>
 
@@ -1129,27 +1053,30 @@
         <!-- TAB 2: KUNCI API (FONNTE & GEMINI) -->
         <div id="tabContentKeys" class="config-tab space-y-3 hidden">
           <p class="text-xs text-stone-600 leading-relaxed">
-            Simpan kunci API Anda langsung ke <strong>Script Properties</strong> server Google Apps Script Anda (Zero Literal Secrets di frontend):
+            Kunci API disimpan secara aman di <strong>Script Properties</strong> server Google Apps Script dan browser lokal Anda:
           </p>
-          <div class="space-y-2 text-xs font-semibold">
+          <div class="space-y-2.5 text-xs font-semibold">
             <div>
               <label class="block text-stone-700 mb-1 flex items-center justify-between">
-                <span>Fonnte WhatsApp Token</span>
-                <span id="badgeFonnteStatus" class="text-[10px] text-stone-400 font-bold">Cek server...</span>
+                <span>Google Gemini AI API Key (Free Tier)</span>
+                <span id="badgeGeminiStatus" class="text-[10px] text-stone-400 font-bold">Cek status...</span>
               </label>
-              <input id="inputFonnteToken" type="password" placeholder="Token dari dashboard Fonnte Anda..." class="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-xs text-stone-800 focus:outline-none focus:ring-2 focus:ring-[#8BC34A]">
+              <input id="inputGeminiApiKey" type="password" placeholder="AIzaSy... (dari aistudio.google.com)" class="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-xs text-stone-800 focus:outline-none focus:ring-2 focus:ring-[#8BC34A]">
+              <p class="text-[10px] text-stone-500 mt-1">
+                Dapatkan gratis dalam 1 menit di <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-blue-600 underline font-bold">Google AI Studio</a>.
+              </p>
             </div>
             <div>
               <label class="block text-stone-700 mb-1 flex items-center justify-between">
-                <span>Google Gemini API Key (Free Tier)</span>
-                <span id="badgeGeminiStatus" class="text-[10px] text-stone-400 font-bold">Cek server...</span>
+                <span>Fonnte WhatsApp Token</span>
+                <span id="badgeFonnteStatus" class="text-[10px] text-stone-400 font-bold">Cek status...</span>
               </label>
-              <input id="inputGeminiApiKey" type="password" placeholder="AI Studio Gemini API Key..." class="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-xs text-stone-800 focus:outline-none focus:ring-2 focus:ring-[#8BC34A]">
+              <input id="inputFonnteToken" type="password" placeholder="Token perangkat dari fonnte.com..." class="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-xs text-stone-800 focus:outline-none focus:ring-2 focus:ring-[#8BC34A]">
             </div>
           </div>
           <button onclick="saveApiKeysToServer()" id="btnSaveApiKeys" class="w-full py-3.5 rounded-full bg-[#1A1B22] text-white font-extrabold text-xs shadow-md active:scale-95 transition flex items-center justify-center gap-1.5">
             <i data-lucide="shield-check" class="w-4 h-4 text-[#8BC34A]"></i>
-            <span>Simpan Kunci ke Server Apps Script</span>
+            <span>Simpan Kunci API</span>
           </button>
         </div>
 
