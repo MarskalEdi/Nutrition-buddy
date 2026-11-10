@@ -112,6 +112,18 @@ function doPost(e) {
       const waRes = kirimWaDirect_(target, pesan);
       res = { success: waRes.status === true, message: waRes.message, detail: waRes.detail };
 
+    } else if (action === 'save_user_profile') {
+      const timbangRow = {
+        TimbangID: 'TMB-' + Utilities.getUuid().slice(0, 8),
+        UserID: body.user_id || 'USR-0001',
+        Tanggal: Utilities.formatDate(new Date(), 'Asia/Jakarta', 'yyyy-MM-dd'),
+        BeratKg: Number(body.berat_badan) || 74.2,
+        Catatan: `BMI: ${body.bmi || 24.2}, TDEE: ${body.tdee || 2365}, Target BB: ${body.target_bb || 68}kg, Target Kalori: ${body.target_kalori || 1865}`,
+        DibuatPada: new Date().toISOString()
+      };
+      bulkAppendRows_('RiwayatTimbang', [timbangRow]);
+      res = { success: true, message: 'Profil dan data timbangan berhasil disimpan ke Google Sheets', data: timbangRow };
+
     } else if (action === 'save_api_keys') {
       if (body.fonnte_token) setProp_('FONNTE_TOKEN', body.fonnte_token.trim());
       if (body.gemini_api_key) setProp_('GEMINI_API_KEY', body.gemini_api_key.trim());

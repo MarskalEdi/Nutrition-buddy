@@ -8,7 +8,18 @@ const AppState = {
   user: {
     nama: 'Brooks',
     nomor_wa: '6281234567890',
-    targetCalories: 1960,
+    gender: 'L',
+    age: 28,
+    heightCm: 175,
+    weightKg: 74.2,
+    targetWeightKg: 68.0,
+    activityLevel: 1.375,
+    deficitLevel: 500,
+    bmr: 1720,
+    tdee: 2365,
+    bmi: 24.2,
+    bmiCategory: 'Normal (Ideal)',
+    targetCalories: 1865,
     consumedCalories: 1420,
     waterDrank: 5,
     waterTarget: 8,
@@ -47,6 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // D. Render Components
   renderCalorieHero();
+  renderBmiTdeeCard();
   renderWaterGlasses();
   startInitialWorkoutTimer();
 
@@ -120,6 +132,278 @@ function renderCalorieHero() {
     const progress = Math.min(1, consumed / target);
     circle.style.strokeDashoffset = circumference - (progress * circumference);
   }
+}
+
+// ========================================================================
+// 3B. BMI, TDEE & RENCANA PENGURANGAN BERAT BADAN
+// ========================================================================
+let currentBmiGender = 'L';
+let currentBmiDeficit = 500;
+let lastCalculatedBmiPlan = null;
+
+function renderBmiTdeeCard() {
+  const u = AppState.user;
+  const bmiVal = document.getElementById('cardBmiVal');
+  const bmiBadge = document.getElementById('cardBmiBadge');
+  const tdeeVal = document.getElementById('cardTdeeVal');
+  const planSummary = document.getElementById('cardGoalPlanSummary');
+
+  if (bmiVal) bmiVal.innerText = u.bmi ? u.bmi.toFixed(1) : '24.2';
+  if (tdeeVal) tdeeVal.innerText = u.tdee ? u.tdee.toLocaleString() : '2,365';
+  if (planSummary) {
+    planSummary.innerText = `Target: ${u.targetWeightKg || 68.0} kg (Defisit -${u.deficitLevel || 500} kcal/hari)`;
+  }
+
+  if (bmiBadge && u.bmiCategory) {
+    bmiBadge.innerText = u.bmiCategory.split(' ')[0];
+    const badgeColors = {
+      'Kurus': 'bg-blue-100 text-[#0288D1]',
+      'Normal': 'bg-green-100 text-[#2E7D32]',
+      'Kelebihan': 'bg-amber-100 text-amber-700',
+      'Overweight': 'bg-amber-100 text-amber-700',
+      'Obesitas': 'bg-red-100 text-red-600'
+    };
+    const catKey = Object.keys(badgeColors).find(k => u.bmiCategory.includes(k)) || 'Normal';
+    bmiBadge.className = `px-2 py-0.5 rounded-full text-[9px] font-extrabold ${badgeColors[catKey]}`;
+  }
+}
+
+function selectBmiGender(gender) {
+  currentBmiGender = gender;
+  const btnL = document.getElementById('btnGenderL');
+  const btnP = document.getElementById('btnGenderP');
+  if (btnL && btnP) {
+    if (gender === 'L') {
+      btnL.className = 'py-2 rounded-xl border-2 border-[#1A1B22] bg-[#1A1B22] text-white text-xs font-extrabold transition flex items-center justify-center gap-1.5';
+      btnP.className = 'py-2 rounded-xl border border-stone-200 text-stone-700 text-xs font-extrabold transition flex items-center justify-center gap-1.5';
+    } else {
+      btnP.className = 'py-2 rounded-xl border-2 border-[#1A1B22] bg-[#1A1B22] text-white text-xs font-extrabold transition flex items-center justify-center gap-1.5';
+      btnL.className = 'py-2 rounded-xl border border-stone-200 text-stone-700 text-xs font-extrabold transition flex items-center justify-center gap-1.5';
+    }
+  }
+  onBmiTdeeInputsChanged();
+}
+
+function selectBmiDeficit(deficit) {
+  currentBmiDeficit = Number(deficit);
+  const defs = [250, 500, 750];
+  defs.forEach(d => {
+    const btn = document.getElementById(`btnDeficit${d}`);
+    if (btn) {
+      if (d === currentBmiDeficit) {
+        btn.className = 'py-2 px-1 rounded-xl border-2 border-[#1A1B22] bg-[#1A1B22] text-white text-[11px] font-extrabold transition';
+      } else {
+        btn.className = 'py-2 px-1 rounded-xl border border-stone-200 text-[11px] font-extrabold text-stone-600 transition';
+      }
+    }
+  });
+  onBmiTdeeInputsChanged();
+}
+
+function openBmiTdeeModal() {
+  const u = AppState.user;
+  const inAge = document.getElementById('bmiInputAge');
+  const inHeight = document.getElementById('bmiInputHeight');
+  const inWeight = document.getElementById('bmiInputWeight');
+  const inTargetWeight = document.getElementById('bmiInputTargetWeight');
+  const inAct = document.getElementById('bmiInputActivity');
+
+  if (inAge) inAge.value = u.age || 28;
+  if (inHeight) inHeight.value = u.heightCm || 175;
+  if (inWeight) inWeight.value = u.weightKg || 74.2;
+  if (inTargetWeight) inTargetWeight.value = u.targetWeightKg || 68.0;
+  if (inAct) inAct.value = String(u.activityLevel || 1.375);
+
+  selectBmiGender(u.gender || 'L');
+  selectBmiDeficit(u.deficitLevel || 500);
+
+  document.getElementById('modalBmiTdee').classList.remove('hidden');
+  onBmiTdeeInputsChanged();
+}
+
+function closeBmiTdeeModal() {
+  document.getElementById('modalBmiTdee').classList.add('hidden');
+}
+
+function onBmiTdeeInputsChanged() {
+  const age = Number(document.getElementById('bmiInputAge')?.value) || 25;
+  const height = Number(document.getElementById('bmiInputHeight')?.value) || 170;
+  const weight = Number(document.getElementById('bmiInputWeight')?.value) || 70;
+  const targetWeight = Number(document.getElementById('bmiInputTargetWeight')?.value) || (weight - 5);
+  const activityLevel = Number(document.getElementById('bmiInputActivity')?.value) || 1.375;
+  const gender = currentBmiGender;
+  const deficitLevel = currentBmiDeficit;
+
+  const plan = calculateBmiTdeePlan(weight, height, age, gender, activityLevel, deficitLevel, targetWeight);
+  lastCalculatedBmiPlan = plan;
+
+  const resBmi = document.getElementById('resBmiValue');
+  const resBadge = document.getElementById('resBmiBadge');
+  const resIdeal = document.getElementById('resIdealRange');
+  const resBmr = document.getElementById('resBmrValue');
+  const resTdee = document.getElementById('resTdeeValue');
+  const resTargetCal = document.getElementById('resTargetCalorieValue');
+  const resDeficit = document.getElementById('resDeficitValue');
+  const resTimeline = document.getElementById('resTimelineText');
+  const resProtein = document.getElementById('resMacroProtein');
+  const resFat = document.getElementById('resMacroFat');
+  const resCarbs = document.getElementById('resMacroCarbs');
+
+  if (resBmi) resBmi.innerText = plan.bmi.toFixed(1);
+  if (resBadge) {
+    resBadge.innerText = plan.bmiCategory;
+    resBadge.className = `px-2.5 py-0.5 rounded-full text-[10px] font-extrabold ${plan.bmiBadgeClass}`;
+  }
+  if (resIdeal) resIdeal.innerText = `${plan.idealWeightMin} – ${plan.idealWeightMax} kg`;
+  if (resBmr) resBmr.innerText = plan.bmr.toLocaleString();
+  if (resTdee) resTdee.innerText = plan.tdee.toLocaleString();
+  if (resTargetCal) resTargetCal.innerText = plan.targetCalories.toLocaleString();
+  if (resDeficit) resDeficit.innerText = `-${plan.deficitLevel} kcal`;
+
+  if (resTimeline) {
+    if (plan.weightToLose > 0) {
+      resTimeline.innerHTML = `
+        <i data-lucide="calendar" class="w-3.5 h-3.5 text-[#8BC34A] shrink-0"></i>
+        <span>Target turun <strong>${plan.weightToLose} kg</strong> tercapai dalam <strong>~${plan.weeksEstimate} minggu (~${Math.ceil(plan.weeksEstimate / 4)} bulan)</strong></span>
+      `;
+    } else {
+      resTimeline.innerHTML = `
+        <i data-lucide="check-circle" class="w-3.5 h-3.5 text-[#8BC34A] shrink-0"></i>
+        <span>Berat badan Anda sudah di target ideal! Pertahankan gaya hidup sehat &amp; seimbang.</span>
+      `;
+    }
+  }
+
+  if (resProtein) resProtein.innerText = `${plan.macros.proteinG}g`;
+  if (resFat) resFat.innerText = `${plan.macros.fatG}g`;
+  if (resCarbs) resCarbs.innerText = `${plan.macros.carbsG}g`;
+
+  if (window.lucide) lucide.createIcons();
+}
+
+function calculateBmiTdeePlan(weight, height, age, gender, activityLevel, deficitLevel, targetWeight) {
+  // 1. BMI Calculation: kg / (m^2)
+  const heightM = height / 100;
+  const bmi = weight / (heightM * heightM);
+
+  // Kategori BMI Standar Kemenkes / Asia Pasifik
+  let bmiCategory = 'Normal (Ideal)';
+  let bmiColor = 'text-green-600';
+  let bmiBadgeClass = 'bg-green-100 text-[#2E7D32]';
+  if (bmi < 18.5) {
+    bmiCategory = 'Kurus (Underweight)';
+    bmiColor = 'text-blue-500';
+    bmiBadgeClass = 'bg-blue-100 text-[#0288D1]';
+  } else if (bmi < 23.0) {
+    bmiCategory = 'Normal (Ideal)';
+    bmiColor = 'text-green-600';
+    bmiBadgeClass = 'bg-green-100 text-[#2E7D32]';
+  } else if (bmi < 25.0) {
+    bmiCategory = 'Kelebihan (Overweight)';
+    bmiColor = 'text-amber-500';
+    bmiBadgeClass = 'bg-amber-100 text-amber-700';
+  } else {
+    bmiCategory = 'Obesitas';
+    bmiColor = 'text-red-500';
+    bmiBadgeClass = 'bg-red-100 text-red-600';
+  }
+
+  // Rentang Berat Badan Ideal (BMI 18.5 - 22.9)
+  const idealWeightMin = Math.round(18.5 * heightM * heightM * 10) / 10;
+  const idealWeightMax = Math.round(22.9 * heightM * heightM * 10) / 10;
+
+  // 2. BMR (Rumus Medis Mifflin-St Jeor)
+  let bmr = (10 * weight) + (6.25 * height) - (5 * age);
+  if (gender === 'L') {
+    bmr += 5;
+  } else {
+    bmr -= 161;
+  }
+  bmr = Math.round(bmr);
+
+  // 3. TDEE = BMR * Activity Factor
+  const tdee = Math.round(bmr * activityLevel);
+
+  // 4. Target Kalori Harian Bersih
+  const minSafeCalories = gender === 'L' ? 1500 : 1200;
+  const targetCalories = Math.max(minSafeCalories, Math.round(tdee - deficitLevel));
+
+  // 5. Estimasi Durasi Penurunan Berat Badan (1 kg lemak tubuh ~ 7.700 kcal defisit)
+  const weightToLose = Math.max(0, weight - targetWeight);
+  let daysEstimate = 0;
+  let weeksEstimate = 0;
+  if (weightToLose > 0 && deficitLevel > 0) {
+    const totalDeficitNeeded = weightToLose * 7700;
+    daysEstimate = Math.round(totalDeficitNeeded / deficitLevel);
+    weeksEstimate = Math.max(1, Math.ceil(daysEstimate / 7));
+  }
+
+  // 6. Pembagian Makronutrisi Harian
+  const proteinG = Math.round(Math.min(weight * 1.8, (targetCalories * 0.28) / 4));
+  const fatG = Math.round((targetCalories * 0.25) / 9);
+  const carbsG = Math.round((targetCalories - (proteinG * 4) - (fatG * 9)) / 4);
+
+  return {
+    bmi: Math.round(bmi * 10) / 10,
+    bmiCategory,
+    bmiColor,
+    bmiBadgeClass,
+    idealWeightMin,
+    idealWeightMax,
+    bmr,
+    tdee,
+    targetCalories,
+    deficitLevel,
+    weightToLose: Math.round(weightToLose * 10) / 10,
+    daysEstimate,
+    weeksEstimate,
+    macros: { proteinG, fatG, carbsG }
+  };
+}
+
+function saveBmiTdeePlan() {
+  if (!lastCalculatedBmiPlan) return;
+
+  const plan = lastCalculatedBmiPlan;
+  const u = AppState.user;
+
+  u.age = Number(document.getElementById('bmiInputAge')?.value) || 28;
+  u.heightCm = Number(document.getElementById('bmiInputHeight')?.value) || 175;
+  u.weightKg = Number(document.getElementById('bmiInputWeight')?.value) || 74.2;
+  u.currentBB = u.weightKg;
+  u.targetWeightKg = Number(document.getElementById('bmiInputTargetWeight')?.value) || 68.0;
+  u.activityLevel = Number(document.getElementById('bmiInputActivity')?.value) || 1.375;
+  u.gender = currentBmiGender;
+  u.deficitLevel = plan.deficitLevel;
+
+  u.bmi = plan.bmi;
+  u.bmiCategory = plan.bmiCategory;
+  u.bmr = plan.bmr;
+  u.tdee = plan.tdee;
+  u.targetCalories = plan.targetCalories;
+
+  // Re-render antarmuka
+  renderCalorieHero();
+  renderBmiTdeeCard();
+  saveCachedState();
+
+  // Sinkronkan ke Google Sheets backend jika online
+  if (CONFIG.GAS_URL) {
+    postToGAS('save_user_profile', {
+      user_id: u.nomor_wa,
+      berat_badan: u.weightKg,
+      tinggi_badan: u.heightCm,
+      usia: u.age,
+      gender: u.gender,
+      bmi: u.bmi,
+      tdee: u.tdee,
+      target_bb: u.targetWeightKg,
+      target_kalori: u.targetCalories
+    }).catch(e => console.log('Sync profile warning:', e));
+  }
+
+  closeBmiTdeeModal();
+  alert(`Rencana berhasil diterapkan! Target kalori harian Anda telah disesuaikan menjadi ${plan.targetCalories.toLocaleString()} kcal (Defisit -${plan.deficitLevel} kcal/hari).`);
 }
 
 function renderWaterGlasses() {
@@ -372,9 +656,10 @@ function sendUserChatMessage() {
 
 async function callDirectGeminiAPI(apiKey, promptText) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  const u = AppState.user;
   const systemInstruction = 
     "Anda adalah FitLife AI Coach, ahli gizi profesional dan ramah di aplikasi NutriTrack & FitLife. " +
-    `Konteks pengguna: Target kalori harian ${AppState.user.targetCalories} kcal, kalori terkonsumsi ${AppState.user.consumedCalories} kcal, target defisit -500 kcal. ` +
+    `Profil pengguna: BB ${u.weightKg}kg, TB ${u.heightCm}cm, BMI ${u.bmi} (${u.bmiCategory}), BMR ${u.bmr} kcal, TDEE ${u.tdee} kcal, Target BB ${u.targetWeightKg}kg, Target kalori harian ${u.targetCalories} kcal (defisit -${u.deficitLevel} kcal/hari). Terkonsumsi hari ini ${u.consumedCalories} kcal. ` +
     "Jawablah dalam Bahasa Indonesia yang ringkas, praktis, ramah, dan memotivasi. Jika menyarankan makanan, sertakan perkiraan kalori (kcal) dan makronutrisi (protein, lemak, karbohidrat). Gunakan format rapi berpoin jika memberikan daftar rekomendasi.";
 
   try {
@@ -465,6 +750,17 @@ function fallbackAIResponse(msg) {
     Silakan klik tombol di bawah untuk langsung membuka tab input kunci API:<br><br>
     <button onclick="openConfigModal('keys')" class="w-full py-2.5 rounded-xl bg-[#1A1B22] text-white font-extrabold text-xs shadow-md active:scale-95 transition flex items-center justify-center gap-1.5">
       <span>🔑 Buka Pengaturan Kunci API Sekarang</span>
+    </button>`;
+  } else if (q.includes('bmi') || q.includes('tdee') || q.includes('bmr') || q.includes('rencana') || q.includes('berat badan') || q.includes('target bb')) {
+    const u = AppState.user;
+    text = `Berikut profil metabolisme &amp; rencana target penurunan berat badan Anda:<br>
+    • <strong>BMI Saat Ini:</strong> ${u.bmi || 24.2} (${u.bmiCategory || 'Normal'})<br>
+    • <strong>BMR (Kalori Basal):</strong> ${u.bmr ? u.bmr.toLocaleString() : '1,720'} kcal/hari<br>
+    • <strong>TDEE (Maintenance):</strong> ${u.tdee ? u.tdee.toLocaleString() : '2,365'} kcal/hari<br>
+    • <strong>Target Kalori Harian:</strong> <strong class="text-[#2E7D32]">${u.targetCalories} kcal/hari</strong> (Defisit -${u.deficitLevel || 500} kcal)<br>
+    • <strong>Target Berat Badan:</strong> ${u.targetWeightKg || 68} kg (saat ini ${u.weightKg || 74.2} kg)<br><br>
+    <button onclick="openBmiTdeeModal()" class="w-full py-2.5 rounded-xl bg-[#1A1B22] text-white font-extrabold text-xs shadow-md active:scale-95 transition flex items-center justify-center gap-1.5">
+      <span>⚖️ Buka &amp; Atur Kalkulator BMI &amp; TDEE</span>
     </button>`;
   } else if (q.includes('camilan') || q.includes('snack') || q.includes('dessert') || q.includes('buah') || q.includes('semangka')) {
     text = `Pilihan camilan sehat &amp; rendah kalori untuk program defisit Anda:<br>• <strong>Semangka Segar (150g)</strong>: ~45 kcal, 92% air hidrasi &amp; elektrolit.<br>• <strong>Apel Fuji (1 buah)</strong>: ~95 kcal, tinggi serat pektin yang mengenyangkan.<br>• <strong>1 Butir Telur Rebus</strong>: ~78 kcal, 6.5g protein murni.<br>• <strong>Greek Yogurt Plain (100g)</strong>: ~60 kcal, 10g protein.<br><br>💡 <em>Tips:</em> Buah berair seperti semangka adalah pilihan penutup terbaik karena memuaskan rasa manis tanpa memicu lonjakan gula darah!`;
